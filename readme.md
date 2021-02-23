@@ -19,4 +19,8 @@ model.classifier[6] = nn.Linear(num_ftrs, 2)
 3. Tried to train vgg-16 from scratch (without pretraining on ImageNet). High memory use and could not perform this locally. Had to use the cluster to compute but the accuracy was horrible - barely over 50%
 4. We finally took a pre-trained VGG-16 but re-trained it on CelebA - aka no parameter was frozen at the beginning and every layer was retrained. This gave the best performance - validation accuracy about 78% on attrativeness attribute prediction. 
 
-currently reconstructing the python script
+## TODO
+ - reconstruct the python script to make it modular
+ - load/save trained model checkpoint
+ - plots
+ - proceed with shortfuse
