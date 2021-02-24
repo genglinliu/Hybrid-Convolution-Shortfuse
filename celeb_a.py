@@ -65,7 +65,6 @@ def initialize_model(learning_rate, num_classes, device):
     num_ftrs = model.classifier[6].in_features
     model.classifier[6] = nn.Linear(num_ftrs, num_classes)
     model = model.to(device)
-    
     # Define loss function and optimizer
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
@@ -73,12 +72,10 @@ def initialize_model(learning_rate, num_classes, device):
 
 
 def train(train_loader, model, criterion, optimizer, num_epochs, device):
-
-    train_step = len(train_loader) # total number of `i`
     for epoch in range(num_epochs): # repeat the entire training `num_epochs` times
         # for each training sample
-        # loss_hist = []
-        # step_hist = []
+        loss_hist = []
+        step_hist = []
         for i, (images, labels) in tqdm(enumerate(train_loader)):
             # move to gpu if available
             labels = labels[:, 2] # attractiveness label
@@ -95,15 +92,16 @@ def train(train_loader, model, criterion, optimizer, num_epochs, device):
             # print
             if (i+1) % 100 == 0:
                 print('Epoch: [{}/{}], Step[{}/{}], Loss:{:.4f}' \
-                    .format(epoch+1, num_epochs, i+1, train_step, loss.item()))
-                # loss_hist.append(loss)
-                # step_hist.append(train_step)
-        # plt.plot(step_hist, loss_hist)
-        # plt.xlabel('train_steps')
-        # plt.ylabel('Loss')
-        # plt.title('epoch'+str(epoch))
-        # plt.savefig(f'../Figures/{epoch}')
-        # plt.clf()
+                    .format(epoch+1, num_epochs, i+1, len(train_loader), loss.item()))
+                loss_hist.append(loss.item())
+                step_hist.append(i+1)
+        
+        plt.plot(step_hist, loss_hist)
+        plt.xlabel('train_iterations')
+        plt.ylabel('Loss')
+        plt.title('epoch'+str(epoch+1))
+        plt.savefig('epoch_1')
+        plt.clf()
         
     torch.save(model.state_dict(), 'cnn.ckpt')
 
@@ -136,7 +134,6 @@ def evaluate(val_loader, model, device):
     
     
 def main():
-    
     # hyper parameters
     num_epochs = 1
     num_classes = 2
@@ -150,7 +147,6 @@ def main():
     model, criterion, optimizer = initialize_model(learning_rate, num_classes, device)
     train(train_loader, model, criterion, optimizer, num_epochs, device)
     evaluate(val_loader, model, device)
-    
     
 
 if __name__ == "__main__":

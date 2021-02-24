@@ -17,10 +17,7 @@ model.classifier[6] = nn.Linear(num_ftrs, 2)
 1. First tried a resnet-18 pretrained on ImageNet and froze the layers except for the last one. Had about 63% validation accuracy. 
 2. Then replaced pretrained resnet with a pretrained VGG-16. Trained on one epoch over the training set and the val accuracy was about 73%. The transfer learning does not perform well for either model. 
 3. Tried to train vgg-16 from scratch (without pretraining on ImageNet). High memory use and could not perform this locally. Had to use the cluster to compute but the accuracy was horrible - barely over 50%
-4. We finally took a pre-trained VGG-16 but re-trained it on CelebA - aka no parameter was frozen at the beginning and every layer was retrained. This gave the best performance - validation accuracy about 78% on attrativeness attribute prediction. 
+4. We finally took a pre-trained VGG-16 but re-trained it on CelebA - aka no parameter was frozen at the beginning and every layer was retrained. This gave the best performance - validation accuracy about 78-79% on attrativeness attribute prediction. 
 
 ## TODO
- - reconstruct the python script to make it modular
- - load/save trained model checkpoint
- - plots
- - proceed with shortfuse
+ - Modify the initial layers of vgg and proceed with shortfuse
