@@ -2,67 +2,28 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+"""
+You got a d-dim covaraite vector as input
+"""
 
-class Hybrid_conv2d(nn.Module):
-    def __init__(self):
+class Hybrid_Conv2d(nn.Module):
+    def __init__(self, channel_in, channel_out, kernel_size, stride=1, padding=0):
         super(Hybrid_conv2d, self).__init__()
-        kernel = [[0.03797616, 0.044863533, 0.03797616],
-                  [0.044863533, 0.053, 0.044863533],
-                  [0.03797616, 0.044863533, 0.03797616]]
-        kernel = torch.FloatTensor(kernel).unsqueeze(0).unsqueeze(0)
-        self.weight = nn.Parameter(data=kernel, requires_grad=False)
+        self.kernel_size = kernel_size
+        self.channel_in = channel_in
+        self.channel_out = channel_out
+        self.stride = stride
+        self.padding = padding
+        
+        self.w_0 = nn.Parameter(torch.randn(channel_out), requires_grad=True)
+        self.w_1 = nn.Parameter(torch.randn(channel_out), requires_grad=True)
  
     def forward(self, x):
-        x1 = x[:, 0]
-        x2 = x[:, 1]
-        x3 = x[:, 2]
-        x1 = F.conv2d(x1.unsqueeze(1), self.weight, padding=2)
-        x2 = F.conv2d(x2.unsqueeze(1), self.weight, padding=2)
-        x3 = F.conv2d(x3.unsqueeze(1), self.weight, padding=2)
-        x = torch.cat([x1, x2, x3], dim=1)
-        return x
-    
-    
-    
-    
-class Conv2d_symmetric(nn.Module):
-    def __init__(self):
-    super(Conv2d_simple, self).__init__()
-
-    self.a = nn.Parameter(torch.randn(1))
-    self.b = nn.Parameter(torch.randn(1))
-    self.c = nn.Parameter(torch.randn(1))
-
-
-    self.bias = None
-    self.stride = 2
-    self.padding = 1
-    self.dilation = 1
-    self.groups = 1
-
-
-
-    def forward(self, input):
-
-        #in case we use gpu we need to create the weight matrix there
-        device = self.a.device
-
-        weight = torch.zeros((1,1,3,3)).to(device)
-        weight[0,0,0,0] += self.c[0]
-        weight[0,0,0,1] += self.b[0]
-        weight[0,0,0,2] += self.c[0]
-        weight[0,0,1,0] += self.b[0]
-        weight[0,0,1,1] += self.a[0]
-        weight[0,0,1,2] += self.b[0]
-        weight[0,0,2,0] += self.c[0]
-        weight[0,0,2,1] += self.b[0]
-        weight[0,0,2,2] += self.c[0]
-
-
-        # print("weight= ", weight)
-        # print("inout = ", input)
-        return F.conv2d(input, weight, self.bias, self.stride,
-                        self.padding, self.dilation, self.groups)
+        
+        w_0 = self.w_0
+        w_1 = self.w_1
+        out = F.conv2d(x, kernel, stride=self.stride, padding=self.padding)
+        return out
         
         
 ########################################################################################
@@ -131,3 +92,45 @@ class GaborConv2d(nn.Module):
         out = F.conv2d(x, kernel, stride=self.stride, padding=self.padding)
 
         return out
+    
+    
+#############################################################
+
+class Conv2d_symmetric(nn.Module):
+    def __init__(self):
+        super(Conv2d_simple, self).__init__()
+
+        self.a = nn.Parameter(torch.randn(1))
+        self.b = nn.Parameter(torch.randn(1))
+        self.c = nn.Parameter(torch.randn(1))
+
+
+        self.bias = None
+        self.stride = 2
+        self.padding = 1
+        self.dilation = 1
+        self.groups = 1
+
+
+
+    def forward(self, input):
+
+        #in case we use gpu we need to create the weight matrix there
+        device = self.a.device
+
+        weight = torch.zeros((1,1,3,3)).to(device)
+        weight[0,0,0,0] += self.c[0]
+        weight[0,0,0,1] += self.b[0]
+        weight[0,0,0,2] += self.c[0]
+        weight[0,0,1,0] += self.b[0]
+        weight[0,0,1,1] += self.a[0]
+        weight[0,0,1,2] += self.b[0]
+        weight[0,0,2,0] += self.c[0]
+        weight[0,0,2,1] += self.b[0]
+        weight[0,0,2,2] += self.c[0]
+
+
+        # print("weight= ", weight)
+        # print("inout = ", input)
+        return F.conv2d(input, weight, self.bias, self.stride,
+                        self.padding, self.dilation, self.groups)
