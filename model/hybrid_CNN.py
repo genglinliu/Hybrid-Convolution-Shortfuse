@@ -6,18 +6,22 @@ import torch.nn.functional as F
 You got a d-dim covaraite vector as input
 K_l = W_0 + W_1 * S_l
 
-S_0 = male, S_1 = female
+S_0 = male (1)
+S_1 = female (0)
 
 So two kinds of kernels; we will have a certain number of each type.
 
 TODO: get the covariate vector first.
+ 
+for i, (images, labels) in enumerate(train_loader):
+    labels = labels[:, 2] # attractiveness label
 
 The rest is just tensor computation
 """
 
 class Hybrid_Conv2d(nn.Module):
     def __init__(self, channel_in, channel_out, kernel_size, stride=1, padding=0):
-        super(Hybrid_conv2d, self).__init__()
+        super(Hybrid_Conv2d, self).__init__()
         self.kernel_size = kernel_size
         self.channel_in = channel_in
         self.channel_out = channel_out

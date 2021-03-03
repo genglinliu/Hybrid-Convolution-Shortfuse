@@ -144,9 +144,11 @@ def main():
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     train_loader, val_loader, test_loader = load_data(batch_size)
     
-    model, criterion, optimizer = initialize_model(learning_rate, num_classes, device)
-    train(train_loader, model, criterion, optimizer, num_epochs, device)
-    evaluate(val_loader, model, device)
+    print(train_loader)
+    
+    # model, criterion, optimizer = initialize_model(learning_rate, num_classes, device)
+    # train(train_loader, model, criterion, optimizer, num_epochs, device)
+    # evaluate(val_loader, model, device)
     
 
 if __name__ == "__main__":
