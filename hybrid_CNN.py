@@ -4,6 +4,15 @@ import torch.nn.functional as F
 
 """
 You got a d-dim covaraite vector as input
+K_l = W_0 + W_1 * S_l
+
+S_0 = male, S_1 = female
+
+So two kinds of kernels; we will have a certain number of each type.
+
+TODO: get the covariate vector first.
+
+The rest is just tensor computation
 """
 
 class Hybrid_Conv2d(nn.Module):
