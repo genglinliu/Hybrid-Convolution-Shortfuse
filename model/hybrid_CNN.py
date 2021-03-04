@@ -2,6 +2,9 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from get_covariates import get_covariates
+
+
 """
 You got a d-dim covaraite vector as input
 K_l = W_0 + W_1 * S_l
