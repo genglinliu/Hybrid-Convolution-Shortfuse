@@ -20,24 +20,36 @@ for i, (images, labels) in enumerate(train_loader):
     labels = labels[:, 2] # attractiveness label
 
 The rest is just tensor computation
+
+TODO:
+
+QUESTION: if S_l is just 0 or 1, then W0 + W1 never really introduce anything else
+But if we pass in the whole vector what would that mean? dimensions would not match either
+
 """
 
 class Hybrid_Conv2d(nn.Module):
     def __init__(self, channel_in, channel_out, kernel_size, stride=1, padding=0):
         super(Hybrid_Conv2d, self).__init__()
-        self.kernel_size = kernel_size
+        self.kernel_size = kernel_size # tuple, ex. (3, 3)
         self.channel_in = channel_in
         self.channel_out = channel_out
         self.stride = stride
         self.padding = padding
         
-        self.w_0 = nn.Parameter(torch.randn(channel_out), requires_grad=True)
-        self.w_1 = nn.Parameter(torch.randn(channel_out), requires_grad=True)
+        # get the structured covariates
+        self.cov = nn.Parameter(get_covariates('Male', 'train'), requires_grad=False)
+        
+        self.W_0 = nn.Parameter(torch.randn(kernel_size), requires_grad=True)
+        self.W_1 = nn.Parameter(torch.randn(kernel_size), requires_grad=True)
  
     def forward(self, x):
         
-        w_0 = self.w_0
-        w_1 = self.w_1
+        cov = self.cov # maybe this cov is just 
+        W_0 = self.W_0
+        W_1 = self.W_1
+        
+        kernel = W_0 + torch.mul(W_1, cov) # this torch.mul is elementwise multiplication unlike matmul
         out = F.conv2d(x, kernel, stride=self.stride, padding=self.padding)
         return out
         
@@ -108,45 +120,3 @@ class GaborConv2d(nn.Module):
         out = F.conv2d(x, kernel, stride=self.stride, padding=self.padding)
 
         return out
-    
-    
-#############################################################
-
-class Conv2d_symmetric(nn.Module):
-    def __init__(self):
-        super(Conv2d_simple, self).__init__()
-
-        self.a = nn.Parameter(torch.randn(1))
-        self.b = nn.Parameter(torch.randn(1))
-        self.c = nn.Parameter(torch.randn(1))
-
-
-        self.bias = None
-        self.stride = 2
-        self.padding = 1
-        self.dilation = 1
-        self.groups = 1
-
-
-
-    def forward(self, input):
-
-        #in case we use gpu we need to create the weight matrix there
-        device = self.a.device
-
-        weight = torch.zeros((1,1,3,3)).to(device)
-        weight[0,0,0,0] += self.c[0]
-        weight[0,0,0,1] += self.b[0]
-        weight[0,0,0,2] += self.c[0]
-        weight[0,0,1,0] += self.b[0]
-        weight[0,0,1,1] += self.a[0]
-        weight[0,0,1,2] += self.b[0]
-        weight[0,0,2,0] += self.c[0]
-        weight[0,0,2,1] += self.b[0]
-        weight[0,0,2,2] += self.c[0]
-
-
-        # print("weight= ", weight)
-        # print("inout = ", input)
-        return F.conv2d(input, weight, self.bias, self.stride,
-                        self.padding, self.dilation, self.groups)
