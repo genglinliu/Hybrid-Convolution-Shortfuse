@@ -1,6 +1,7 @@
 from __future__ import print_function, division
 
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 
 import torch
@@ -19,10 +20,53 @@ from torch.utils.data import sampler
 import PIL.Image as Image
 from tqdm import tqdm
 
+# from get_covariates import *
+
 import time
+
+
+def get_covariates(cov_name, split):
+    """
+    get a list of strutured covariates as a pytorch tensor
+    split by train/val/test
+    
+    input:
+     - cov_name = 'Male'
+     - split = 'train', 'val' or 'test'
+    
+    Here we're mostly interested in gender so our covaraite is male/female
+    Male = 1, Female = 0
+    
+    return:
+     - a pytorch tensor, list of gender attribute values
+    """
+    
+    list_attr_fn = "data/celeba/list_attr_celeba.txt"
+    splits_fn = "data/celeba/list_eval_partition.txt"
+    attr = pd.read_csv(list_attr_fn, delim_whitespace=True, header=1)
+    splits = pd.read_csv(splits_fn, delim_whitespace=True, header=None, index_col=0)
+
+    attr = (attr + 1) // 2  # map from {-1, 1} to {0, 1}
+    
+    train_mask = (splits[1] == 0)
+    val_mask = (splits[1] == 1)
+    test_mask = (splits[1] == 2)
+    
+    
+    if split == 'train':
+        return torch.as_tensor(attr[cov_name][train_mask])
+    elif split == 'val':
+        return torch.as_tensor(attr[cov_name][val_mask])
+    else:
+        return torch.as_tensor(attr[cov_name][test_mask])
+
+
 
 # get dataset
 def load_data(batch_size):
+    """
+    return the train/val/test dataloader
+    """
     
     transform = transforms.Compose([
         transforms.Resize((224, 224)),
@@ -61,6 +105,13 @@ def load_data(batch_size):
 
 
 def initialize_model(learning_rate, num_classes, device):
+    """
+    initialize the model (pretrained vgg16_bn)
+    define loss function and optimizer and move data to gpu if available
+    
+    return:
+        model, loss function(criterion), optimizer
+    """
     model = models.vgg16_bn(pretrained=True)
     num_ftrs = model.classifier[6].in_features
     model.classifier[6] = nn.Linear(num_ftrs, num_classes)
@@ -72,6 +123,11 @@ def initialize_model(learning_rate, num_classes, device):
 
 
 def train(train_loader, model, criterion, optimizer, num_epochs, device):
+    """
+    Move data to GPU memory and train for specified number of epochs
+    Also plot the loss function and save it in `Figures/`
+    Trained model is saved as `cnn.ckpt`
+    """
     for epoch in range(num_epochs): # repeat the entire training `num_epochs` times
         # for each training sample
         loss_hist = []
@@ -103,10 +159,13 @@ def train(train_loader, model, criterion, optimizer, num_epochs, device):
         plt.savefig('epoch_1')
         plt.clf()
         
-    torch.save(model.state_dict(), 'cnn.ckpt')
+    torch.save(model.state_dict(), 'cnn1.ckpt')
 
 
 def evaluate(val_loader, model, device):
+    """
+    Run the validation set on the trained model
+    """
     model.eval() # BatchNorm uses moving mean/variance instead of mini-batch mean/variance
     with torch.no_grad():
         # initialize the stats
@@ -143,12 +202,10 @@ def main():
     
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     train_loader, val_loader, test_loader = load_data(batch_size)
-    
-    print(train_loader)
-    
-    # model, criterion, optimizer = initialize_model(learning_rate, num_classes, device)
-    # train(train_loader, model, criterion, optimizer, num_epochs, device)
-    # evaluate(val_loader, model, device)
+        
+    model, criterion, optimizer = initialize_model(learning_rate, num_classes, device)
+    train(train_loader, model, criterion, optimizer, num_epochs, device)
+    evaluate(val_loader, model, device)
     
 
 if __name__ == "__main__":

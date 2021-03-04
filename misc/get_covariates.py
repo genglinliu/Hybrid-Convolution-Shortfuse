@@ -19,8 +19,8 @@ def get_covariates(cov_name, split):
     
     """
     
-    list_attr_fn = "data/celeba/list_attr_celeba.txt"
-    splits_fn = "data/celeba/list_eval_partition.txt"
+    list_attr_fn = "../data/celeba/list_attr_celeba.txt"
+    splits_fn = "../data/celeba/list_eval_partition.txt"
     attr = pd.read_csv(list_attr_fn, delim_whitespace=True, header=1)
     splits = pd.read_csv(splits_fn, delim_whitespace=True, header=None, index_col=0)
 
@@ -38,4 +38,11 @@ def get_covariates(cov_name, split):
     else:
         return torch.as_tensor(attr[cov_name][test_mask])
 
+
+
+# def main():
+#     res = get_covariates('Male', 'train')
+#     print(res)
     
+# if __name__ == "__main__":
+#     main()
