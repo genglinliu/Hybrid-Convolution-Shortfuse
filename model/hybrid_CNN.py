@@ -23,8 +23,13 @@ The rest is just tensor computation
 
 TODO:
 
-QUESTION: if S_l is just 0 or 1, then W0 + W1 never really introduce anything else
-But if we pass in the whole vector what would that mean? dimensions would not match either
+premise: male=1, female=0
+on every iteration, only one image sample passes through the hybrid layer
+so we pass in this one scaler (1 or 0) to the hybrid layer as a parameter
+We define s_l as a scaler, so the '1' samples will make w_1 activate
+
+K_l = W_0 + W_1 * S_l
+
 
 """
 
