@@ -34,27 +34,25 @@ K_l = W_0 + W_1 * S_l
 """
 
 class Hybrid_Conv2d(nn.Module):
-    def __init__(self, channel_in, channel_out, kernel_size, stride=1, padding=0):
+    def __init__(self, channel_in, channel_out, kernel_size, stride=1, padding=0, cov=0):
         super(Hybrid_Conv2d, self).__init__()
         self.kernel_size = kernel_size # tuple, ex. (3, 3)
         self.channel_in = channel_in
         self.channel_out = channel_out
         self.stride = stride
         self.padding = padding
-        
-        # get the structured covariates
-        self.cov = nn.Parameter(get_covariates('Male', 'train'), requires_grad=False)
+        self.cov = cov
         
         self.W_0 = nn.Parameter(torch.randn(kernel_size), requires_grad=True)
         self.W_1 = nn.Parameter(torch.randn(kernel_size), requires_grad=True)
  
     def forward(self, x):
         
-        cov = self.cov # maybe this cov is just 
+        cov = self.cov 
         W_0 = self.W_0
         W_1 = self.W_1
         
-        kernel = W_0 + torch.mul(W_1, cov) # this torch.mul is elementwise multiplication unlike matmul
+        kernel = W_0 + torch.mul(W_1, cov)
         out = F.conv2d(x, kernel, stride=self.stride, padding=self.padding)
         return out
         
