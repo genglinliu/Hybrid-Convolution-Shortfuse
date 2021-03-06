@@ -20,7 +20,7 @@ from torch.utils.data import sampler
 import PIL.Image as Image
 from tqdm import tqdm
 
-from get_covariates import get_covariates
+from model import hybrid_CNN
 
 import time
 
@@ -100,6 +100,13 @@ def train(train_loader, model, criterion, optimizer, num_epochs, device):
             labels = labels[:, 2] # attractiveness label
             images = images.to(device)
             labels = labels.to(device)
+            
+            ############################################
+            # TODO: you get the cov label HERE 
+            #       and then pass into the model
+            #       figure out a way
+            #############################################
+            
             # forward pass
             outputs = model(images)
             loss = criterion(outputs, labels) # still a tensor so we need to use .item() when printing
