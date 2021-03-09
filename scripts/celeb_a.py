@@ -72,7 +72,7 @@ def initialize_model(learning_rate, num_classes, device):
     return:
         model, loss function(criterion), optimizer
     """
-    model = models.vgg16_bn(pretrained=True)
+    model = models.vgg16_bn(pretrained=True)                ############## add param here? ################
     num_ftrs = model.classifier[6].in_features
     model.classifier[6] = nn.Linear(num_ftrs, num_classes)
     model = model.to(device)
@@ -80,6 +80,14 @@ def initialize_model(learning_rate, num_classes, device):
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
     return model, criterion, optimizer
+
+def make_plots(step_hist, loss_hist):
+    plt.plot(step_hist, loss_hist)
+    plt.xlabel('train_iterations')
+    plt.ylabel('Loss')
+    plt.title('epoch'+str(epoch+1))
+    plt.savefig('epoch_1')
+    plt.clf()
 
 
 def train(train_loader, model, criterion, optimizer, num_epochs, device):
@@ -94,7 +102,10 @@ def train(train_loader, model, criterion, optimizer, num_epochs, device):
         step_hist = []
         for i, (images, labels) in tqdm(enumerate(train_loader)):
             # move to gpu if available
-            labels = labels[:, 2] # attractiveness label
+            labels = labels[:, 2]   # attractiveness label
+            attr = labels[:, 20]    # gender (male/female)   
+            attr = (attr + 1) // 2  # map from {-1, 1} to {0, 1}
+            
             images = images.to(device)
             labels = labels.to(device)
             
@@ -103,6 +114,12 @@ def train(train_loader, model, criterion, optimizer, num_epochs, device):
             #       and then pass into the model
             #       figure out a way
             #############################################
+            
+            """
+            ex. pass in additional param at initialize_model()
+            You will eventually have to modify vgg so stop pulling it from pytorch
+            just import your package locally. Ideally get that .pth file with pretrained model
+            """
             
             # forward pass
             outputs = model(images)
@@ -119,12 +136,7 @@ def train(train_loader, model, criterion, optimizer, num_epochs, device):
                 loss_hist.append(loss.item())
                 step_hist.append(i+1)
         
-        plt.plot(step_hist, loss_hist)
-        plt.xlabel('train_iterations')
-        plt.ylabel('Loss')
-        plt.title('epoch'+str(epoch+1))
-        plt.savefig('epoch_1')
-        plt.clf()
+        make_plots(step_hist, loss_hist)
         
     torch.save(model.state_dict(), 'cnn1.ckpt')
 
