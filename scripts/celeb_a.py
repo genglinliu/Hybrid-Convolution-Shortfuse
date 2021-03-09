@@ -12,10 +12,7 @@ import torchvision
 from torchvision import models, transforms, datasets
 
 import torch.optim as optim
-from torch.optim import lr_scheduler
-
 from torch.utils.data import DataLoader
-from torch.utils.data import sampler
 
 import PIL.Image as Image
 from tqdm import tqdm
