@@ -59,7 +59,7 @@ class ConvNet(nn.Module):
         super(ConvNet, self).__init__()
         # TODO: define the layers of the network
         self.layer1 = nn.Sequential(
-            nn.Conv2d(1, 32, 3),
+            nn.Conv2d(3, 32, 3),
             nn.ReLU(),
             nn.Conv2d(32, 64, 3),
             nn.ReLU(),
@@ -68,7 +68,7 @@ class ConvNet(nn.Module):
             nn.Flatten()
         )
         self.layer2 = nn.Sequential(
-            nn.Linear(9216, 128),
+            nn.Linear(774400, 128),
             nn.ReLU(),
             nn.Dropout2d(0.5),
             nn.Linear(128, 2) # binary classification
