@@ -59,16 +59,16 @@ class ConvNet(nn.Module):
         super(ConvNet, self).__init__()
         # TODO: define the layers of the network
         self.layer1 = nn.Sequential(
-            nn.Conv2d(3, 32, 3),
+            nn.Conv2d(3, 16, 3), ############## change this to hybrid and add cov param ################
             nn.ReLU(),
-            nn.Conv2d(32, 64, 3),
+            nn.Conv2d(16, 32, 3),
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2, stride=2),
             nn.Dropout2d(0.25),
             nn.Flatten()
         )
         self.layer2 = nn.Sequential(
-            nn.Linear(774400, 128),
+            nn.Linear(387200, 128),
             nn.ReLU(),
             nn.Dropout2d(0.5),
             nn.Linear(128, 2) # binary classification
@@ -76,5 +76,31 @@ class ConvNet(nn.Module):
 
     def forward(self, x):
         out = self.layer1(x)
+        print(out.shape)
         out = self.layer2(out)
         return out
+    
+    
+    
+class TwoLayerCNN(nn.Module):
+    """ 
+    model from pytorch tutorial site 
+    https://pytorch.org/tutorials/beginner/blitz/cifar10_tutorial.html
+    """
+    def __init__(self):
+        super(TwoLayerCNN, self).__init__()
+        self.conv1 = nn.Conv2d(3, 6, 5)
+        self.pool = nn.MaxPool2d(2, 2)
+        self.conv2 = nn.Conv2d(6, 16, 5)
+        self.fc1 = nn.Linear(359552, 120) # change made here
+        self.fc2 = nn.Linear(120, 84)
+        self.fc3 = nn.Linear(84, 10)
+
+    def forward(self, x):
+        x = self.pool(F.relu(self.conv1(x)))
+        x = self.pool(F.relu(self.conv2(x)))
+        x = x.view(-1, 359552)
+        x = F.relu(self.fc1(x))
+        x = F.relu(self.fc2(x))
+        x = self.fc3(x)
+        return x
