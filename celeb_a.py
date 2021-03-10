@@ -109,8 +109,8 @@ def train(train_loader, model, criterion, optimizer, num_epochs, device):
         for i, (images, labels) in tqdm(enumerate(train_loader)):
             # move to gpu if available
             label = labels[:, 2]   # attractiveness label
-            attr = labels[:, 20]    # gender (male/female)   
-            attr = (attr + 1) // 2  # map from {-1, 1} to {0, 1}
+            cov_attr = labels[:, 20]    # gender (male/female)   
+            cov_attr = (cov_attr + 1) // 2  # map from {-1, 1} to {0, 1}
             
             images = images.to(device)
             label = label.to(device)
@@ -128,7 +128,7 @@ def train(train_loader, model, criterion, optimizer, num_epochs, device):
             """
             
             # forward pass
-            outputs = model(images)
+            outputs = model(images, cov_attr)    # model takes covariate here
             loss = criterion(outputs, label) # still a tensor so we need to use .item() when printing
             
             # backward
