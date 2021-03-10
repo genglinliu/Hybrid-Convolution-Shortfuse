@@ -17,7 +17,7 @@ from torch.utils.data import DataLoader
 import PIL.Image as Image
 from tqdm import tqdm
 
-from model import hybrid_CNN
+from model.hybrid_CNN import Hybrid_Conv2d, ConvNet
 
 import time
 
@@ -72,16 +72,19 @@ def initialize_model(learning_rate, num_classes, device):
     return:
         model, loss function(criterion), optimizer
     """
-    model = models.vgg16_bn(pretrained=True)                ############## add param here? ################
-    num_ftrs = model.classifier[6].in_features
-    model.classifier[6] = nn.Linear(num_ftrs, num_classes)
+    # model = models.vgg16_bn(pretrained=True)                ############## add param here? ################
+    # num_ftrs = model.classifier[6].in_features
+    # model.classifier[6] = nn.Linear(num_ftrs, num_classes)
+    
+    model = ConvNet()
+    
     model = model.to(device)
     # Define loss function and optimizer
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
     return model, criterion, optimizer
 
-def make_plots(step_hist, loss_hist):
+def make_plots(step_hist, loss_hist, epoch=0):
     plt.plot(step_hist, loss_hist)
     plt.xlabel('train_iterations')
     plt.ylabel('Loss')
@@ -102,12 +105,12 @@ def train(train_loader, model, criterion, optimizer, num_epochs, device):
         step_hist = []
         for i, (images, labels) in tqdm(enumerate(train_loader)):
             # move to gpu if available
-            labels = labels[:, 2]   # attractiveness label
+            label = labels[:, 2]   # attractiveness label
             attr = labels[:, 20]    # gender (male/female)   
             attr = (attr + 1) // 2  # map from {-1, 1} to {0, 1}
             
             images = images.to(device)
-            labels = labels.to(device)
+            label = label.to(device)
             
             ############################################
             # TODO: you get the cov label HERE 
@@ -123,7 +126,7 @@ def train(train_loader, model, criterion, optimizer, num_epochs, device):
             
             # forward pass
             outputs = model(images)
-            loss = criterion(outputs, labels) # still a tensor so we need to use .item() when printing
+            loss = criterion(outputs, label) # still a tensor so we need to use .item() when printing
             
             # backward
             optimizer.zero_grad()
@@ -136,7 +139,7 @@ def train(train_loader, model, criterion, optimizer, num_epochs, device):
                 loss_hist.append(loss.item())
                 step_hist.append(i+1)
         
-        make_plots(step_hist, loss_hist)
+        make_plots(step_hist, loss_hist, epoch)
         
     torch.save(model.state_dict(), 'cnn1.ckpt')
 
@@ -153,18 +156,18 @@ def evaluate(val_loader, model, device):
         # pass through testing data once
         for images, labels in val_loader:
 
-            labels = labels[:, 2]
+            label = labels[:, 2]
             # again move to device first
             images = images.to(device)
-            labels = labels.to(device)
+            label = label.to(device)
             # forward once
             outputs = model(images)
             # instead of calculating loss we will get predictions
             # it's essetially outputs just reformatting imo
             _, predicted = torch.max(outputs.data, 1)
             # accumulate stats
-            total += labels.size(0) # yeah again, number of elements in the tensor
-            correct += (labels == predicted).sum().item()
+            total += label.size(0) # yeah again, number of elements in the tensor
+            correct += (label == predicted).sum().item()
 
         # print
         print('Test accuracy on 10000 test images: {}%' \

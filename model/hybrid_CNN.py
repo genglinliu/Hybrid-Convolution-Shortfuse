@@ -24,6 +24,9 @@ K_l = W_0 + W_1 * S_l
 """
 
 class Hybrid_Conv2d(nn.Module):
+    """    
+    (self, channel_in, channel_out, kernel_size, stride=1, padding=0, cov=0)
+    """    
     def __init__(self, channel_in, channel_out, kernel_size, stride=1, padding=0, cov=0):
         super(Hybrid_Conv2d, self).__init__()
         self.kernel_size = kernel_size # tuple, ex. (3, 3)
@@ -44,4 +47,34 @@ class Hybrid_Conv2d(nn.Module):
         
         kernel = W_0 + torch.mul(W_1, cov)
         out = F.conv2d(x, kernel, stride=self.stride, padding=self.padding)
+        return out
+    
+    
+    
+class ConvNet(nn.Module):
+    """
+    Simple two-layer CNN 
+    """
+    def __init__(self):
+        super(ConvNet, self).__init__()
+        # TODO: define the layers of the network
+        self.layer1 = nn.Sequential(
+            nn.Conv2d(1, 32, 3),
+            nn.ReLU(),
+            nn.Conv2d(32, 64, 3),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2),
+            nn.Dropout2d(0.25),
+            nn.Flatten()
+        )
+        self.layer2 = nn.Sequential(
+            nn.Linear(9216, 128),
+            nn.ReLU(),
+            nn.Dropout2d(0.5),
+            nn.Linear(128, 2) # binary classification
+        )
+
+    def forward(self, x):
+        out = self.layer1(x)
+        out = self.layer2(out)
         return out
