@@ -184,10 +184,17 @@ def main():
     model_name = "vgg-16"
     
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    
+    print("Loading data...\n")
     train_loader, val_loader, test_loader = load_data(batch_size)
-        
+    
+    print("Initializing model... \n")
     model, criterion, optimizer = initialize_model(learning_rate, num_classes, device)
+    
+    print("Start training... \n")
     train(train_loader, model, criterion, optimizer, num_epochs, device)
+    
+    print("Start evaluating... \n")
     evaluate(val_loader, model, device)    
 
 if __name__ == "__main__":
