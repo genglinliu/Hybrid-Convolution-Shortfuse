@@ -27,7 +27,7 @@ class Hybrid_Conv2d(nn.Module):
     """    
     (self, channel_in, channel_out, kernel_size, stride=1, padding=0, cov=0)
     """    
-    def __init__(self, channel_in, channel_out, kernel_size, cov, stride=1, padding=0, ):
+    def __init__(self, channel_in, channel_out, kernel_size, stride=1, padding=0, cov=0):
         super(Hybrid_Conv2d, self).__init__()
         self.kernel_size = kernel_size # tuple, ex. (3, 3)
         self.channel_in = channel_in
@@ -57,27 +57,30 @@ class ConvNet(nn.Module):
     https://discuss.pytorch.org/t/forward-pass-with-different-weights/9068
     """
     def __init__(self): # changed here
-        super(ConvNet, self).__init__()
-        # TODO: define the layers of the network
-        self.layer1 = nn.Sequential(
-            Hybrid_Conv2d(3, 16, kernel_size=(3, 3), cov=cov), # changed here
-            nn.ReLU(),
-            nn.Conv2d(16, 32, 3),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2),
-            nn.Flatten()
-        )
-        self.layer2 = nn.Sequential(
-            nn.Linear(387200, 128), # out.shape after layer1 in forward
-            nn.ReLU(),
-            nn.Linear(128, 2) # binary classification
-        )
+        super(ConvNet, self).__init__()    
+        self.hybrid_conv1 = Hybrid_Conv2d(3, 16, kernel_size=(3, 3), cov=0) 
+        self.hybrid_conv2 = Hybrid_Conv2d(3, 16, kernel_size=(3, 3), cov=1)
+        self.conv2 = nn.Conv2d(16, 32, 3)
+        self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
+
+        self.fc1 = nn.Linear(387200, 128)
+        self.fc2 = nn.Linear(128, 2) # binary classification
+        
 
     def forward(self, x, cov):
         if cov==0:
-            out = self.layer1(x, cov)
-            out = self.layer2(out)
+            x = F.relu(self.hybrid_conv1(x))
+            x = self.pool(F.relu(self.conv2(x)))
+            x = x.view(-1) # flatten
+            x = F.relu(self.fc1(x))
+            x = self.fc2(x)
         elif cov==1:
-            out = self.layer1(x, cov)
-            out = self.layer2(out)
-        return out
+            x = F.relu(self.hybrid_conv2(x))
+            x = self.pool(F.relu(self.conv2(x)))
+            x = x.view(-1) # flatten
+            x = F.relu(self.fc1(x))
+            x = self.fc2(x)
+        return x
+    
+    
+    

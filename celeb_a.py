@@ -115,18 +115,6 @@ def train(train_loader, model, criterion, optimizer, num_epochs, device):
             images = images.to(device)
             label = label.to(device)
             
-            ############################################
-            # TODO: you get the cov label HERE 
-            #       and then pass into the model
-            #       figure out a way
-            #############################################
-            
-            """
-            ex. pass in additional param at initialize_model()
-            You will eventually have to modify vgg so stop pulling it from pytorch
-            just import your package locally. Ideally get that .pth file with pretrained model
-            """
-            
             # forward pass
             outputs = model(images, cov_attr)    # model takes covariate here
             loss = criterion(outputs, label) # still a tensor so we need to use .item() when printing
