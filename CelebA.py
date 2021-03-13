@@ -118,7 +118,8 @@ def train(train_loader, model, criterion, optimizer, num_epochs, device):
             
             # forward pass
             outputs = model(images, cov_attr)    # model takes covariate here
-            loss = criterion(outputs, label) # still a tensor so we need to use .item() when printing
+            print("line 121 loss: ", outputs)
+            loss = criterion(outputs, label) 
             
             # backward
             optimizer.zero_grad()

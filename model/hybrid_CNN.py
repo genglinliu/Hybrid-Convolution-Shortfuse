@@ -29,7 +29,7 @@ class Hybrid_Conv2d(nn.Module):
     """    
     def __init__(self, channel_in, channel_out, kernel_size, stride=1, padding=0, cov=0):
         super(Hybrid_Conv2d, self).__init__()
-        self.kernel_size = kernel_size # tuple, ex. (3, 3)
+        self.kernel_size = kernel_size # 4D weight (out_channel, in_channel, height, width)
         self.channel_in = channel_in
         self.channel_out = channel_out
         self.stride = stride
@@ -48,7 +48,7 @@ class Hybrid_Conv2d(nn.Module):
         kernel = W_0 + torch.mul(W_1, cov)
         # print("line 49 kernel: ", kernel)
         print("line 50 stride: ", self.stride)
-        out = F.conv2d(x, kernel, self.stride, padding=self.padding)
+        out = F.conv2d(x, kernel, stride=self.stride, padding=self.padding)
         return out
     
     
@@ -60,8 +60,8 @@ class ConvNet(nn.Module):
     """
     def __init__(self): # changed here
         super(ConvNet, self).__init__()    
-        self.hybrid_conv1 = Hybrid_Conv2d(3, 16, kernel_size=(3, 3, 3), cov=0) 
-        self.hybrid_conv2 = Hybrid_Conv2d(3, 16, kernel_size=(3, 3, 3), cov=1)
+        self.hybrid_conv1 = Hybrid_Conv2d(3, 16, kernel_size=(16, 3, 3, 3), cov=0) 
+        self.hybrid_conv2 = Hybrid_Conv2d(3, 16, kernel_size=(16, 3, 3, 3), cov=1)
         self.conv2 = nn.Conv2d(16, 32, 3)
         self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
 
