@@ -16,7 +16,7 @@ for i, (images, labels) in enumerate(train_loader):
 The rest is just tensor computation
 
 on every iteration, only one image sample passes through the hybrid layer
-so we pass in this one scaler (1 or 0) to the hybrid layer as a parameter
+so we pass in this one scaler (1 or -1) to the hybrid layer as a parameter
 We define s_l as a scaler, so the '1' samples will make w_1 activate
 
 K_l = W_0 + W_1 * S_l
@@ -46,7 +46,9 @@ class Hybrid_Conv2d(nn.Module):
         W_1 = self.W_1
         
         kernel = W_0 + torch.mul(W_1, cov)
-        out = F.conv2d(x, kernel, stride=self.stride, padding=self.padding)
+        # print("line 49 kernel: ", kernel)
+        print("line 50 stride: ", self.stride)
+        out = F.conv2d(x, kernel, self.stride, padding=self.padding)
         return out
     
     
@@ -58,8 +60,8 @@ class ConvNet(nn.Module):
     """
     def __init__(self): # changed here
         super(ConvNet, self).__init__()    
-        self.hybrid_conv1 = Hybrid_Conv2d(3, 16, kernel_size=(3, 3), cov=0) 
-        self.hybrid_conv2 = Hybrid_Conv2d(3, 16, kernel_size=(3, 3), cov=1)
+        self.hybrid_conv1 = Hybrid_Conv2d(3, 16, kernel_size=(3, 3, 3), cov=0) 
+        self.hybrid_conv2 = Hybrid_Conv2d(3, 16, kernel_size=(3, 3, 3), cov=1)
         self.conv2 = nn.Conv2d(16, 32, 3)
         self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
 
@@ -68,6 +70,7 @@ class ConvNet(nn.Module):
         
 
     def forward(self, x, cov):
+        # print("line 71 ", cov)
         if cov==0:
             x = F.relu(self.hybrid_conv1(x))
             x = self.pool(F.relu(self.conv2(x)))

@@ -112,6 +112,7 @@ def train(train_loader, model, criterion, optimizer, num_epochs, device):
             cov_attr = labels[:, 20]    # gender (male/female)   
             cov_attr = (cov_attr + 1) // 2  # map from {-1, 1} to {0, 1}
             
+            print("line 115 image shape: ", images.shape)
             images = images.to(device)
             label = label.to(device)
             
@@ -169,7 +170,7 @@ def main():
     # hyper parameters
     num_epochs = 1
     num_classes = 2
-    batch_size = 8
+    batch_size = 1 # WE WANT IMAGES TO PASS HYBRID CONV LAYER ONE BY ONE
     learning_rate = 0.001
     model_name = "vgg-16"
     
