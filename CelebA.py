@@ -67,7 +67,7 @@ def load_data(batch_size):
     return train_loader, val_loader, test_loader
 
 
-def initialize_model(learning_rate, num_classes, device):
+def initialize_model(model_name, learning_rate, num_classes, device):
     """
     initialize the model (pretrained vgg16_bn)
     define loss function and optimizer and move data to gpu if available
@@ -79,11 +79,11 @@ def initialize_model(learning_rate, num_classes, device):
     # num_ftrs = model.classifier[6].in_features
     # model.classifier[6] = nn.Linear(num_ftrs, num_classes)
     
-    model = ConvNet()
-    
-    model = model.to(device)
+    model = model_name.to(device)
     # Define loss function and optimizer
     criterion = nn.CrossEntropyLoss()
+    # criterion = nn.BCELoss()
+
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
     return model, criterion, optimizer
 
@@ -112,13 +112,11 @@ def train(train_loader, model, criterion, optimizer, num_epochs, device):
             cov_attr = labels[:, 20]    # gender (male/female)   
             cov_attr = (cov_attr + 1) // 2  # map from {-1, 1} to {0, 1}
             
-            print("line 115 image shape: ", images.shape)
             images = images.to(device)
             label = label.to(device)
             
             # forward pass
             outputs = model(images, cov_attr)    # model takes covariate here
-            print("line 121 loss: ", outputs)
             loss = criterion(outputs, label) 
             
             # backward
@@ -169,11 +167,13 @@ def evaluate(val_loader, model, device):
     
 def main():
     # hyper parameters
+    print("importing dependencies...")
+    
     num_epochs = 1
     num_classes = 2
     batch_size = 1 # WE WANT IMAGES TO PASS HYBRID CONV LAYER ONE BY ONE
     learning_rate = 0.001
-    model_name = "vgg-16"
+    model_name = HybridConvNet()
     
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     
@@ -181,7 +181,7 @@ def main():
     train_loader, val_loader, test_loader = load_data(batch_size)
     
     print("Initializing model...")
-    model, criterion, optimizer = initialize_model(learning_rate, num_classes, device)
+    model, criterion, optimizer = initialize_model(model_name, learning_rate, num_classes, device)
     
     print("Start training... \n")
     train(train_loader, model, criterion, optimizer, num_epochs, device)

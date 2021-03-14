@@ -46,20 +46,17 @@ class Hybrid_Conv2d(nn.Module):
         W_1 = self.W_1
         
         kernel = W_0 + torch.mul(W_1, cov)
-        # print("line 49 kernel: ", kernel)
-        print("line 50 stride: ", self.stride)
         out = F.conv2d(x, kernel, stride=self.stride, padding=self.padding)
         return out
     
     
     
-class ConvNet(nn.Module):
+class HybridConvNet(nn.Module):
     """
-    Simple two-layer CNN 
-    https://discuss.pytorch.org/t/forward-pass-with-different-weights/9068
+    Simple two-layer CNN with hybrid layer
     """
-    def __init__(self): # changed here
-        super(ConvNet, self).__init__()    
+    def __init__(self): 
+        super(HybridConvNet, self).__init__()    
         self.hybrid_conv1 = Hybrid_Conv2d(3, 16, kernel_size=(16, 3, 3, 3), cov=0) 
         self.hybrid_conv2 = Hybrid_Conv2d(3, 16, kernel_size=(16, 3, 3, 3), cov=1)
         self.conv2 = nn.Conv2d(16, 32, 3)
@@ -68,22 +65,65 @@ class ConvNet(nn.Module):
         self.fc1 = nn.Linear(387200, 128)
         self.fc2 = nn.Linear(128, 2) # binary classification
         
-
     def forward(self, x, cov):
-        # print("line 71 ", cov)
         if cov==0:
             x = F.relu(self.hybrid_conv1(x))
             x = self.pool(F.relu(self.conv2(x)))
-            x = x.view(-1) # flatten
+            x = x.view(1, -1) # flatten
             x = F.relu(self.fc1(x))
             x = self.fc2(x)
         elif cov==1:
             x = F.relu(self.hybrid_conv2(x))
             x = self.pool(F.relu(self.conv2(x)))
-            x = x.view(-1) # flatten
+            x = x.view(1, -1) # flatten
             x = F.relu(self.fc1(x))
             x = self.fc2(x)
         return x
     
     
     
+class ConvNet_v1(nn.Module):
+    """
+    Simple two-layer CNN (this works)
+    """
+    def __init__(self):
+        super(ConvNet_v1, self).__init__()
+        self.layer1 = nn.Sequential(
+            nn.Conv2d(3, 16, 3),
+            nn.ReLU(),
+            nn.Conv2d(16, 32, 3),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2),
+            nn.Flatten()
+        )
+        self.layer2 = nn.Sequential(
+            nn.Linear(387200, 128),
+            nn.ReLU(),
+            nn.Linear(128, 2) 
+        )
+
+    def forward(self, x):
+        out = self.layer1(x)
+        out = self.layer2(out)
+        return out
+    
+class ConvNet_v2(nn.Module):
+    """
+    Simple two-layer CNN with no Sequential container
+    """
+    def __init__(self): 
+        super(ConvNet_v2, self).__init__()    
+        self.conv1 = nn.Conv2d(3, 16, 3)
+        self.conv2 = nn.Conv2d(16, 32, 3)
+        self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
+
+        self.fc1 = nn.Linear(387200, 128)
+        self.fc2 = nn.Linear(128, 2) 
+        
+    def forward(self, x):
+        x = F.relu(self.conv1(x))
+        x = self.pool(F.relu(self.conv2(x)))
+        x = x.view(1, -1) 
+        x = F.relu(self.fc1(x))
+        x = self.fc2(x)
+        return x
