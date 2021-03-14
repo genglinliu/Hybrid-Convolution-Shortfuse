@@ -30,11 +30,24 @@ ex. if the current training image has a label "male", then the conv parameter of
 This will be adapted to 3D tasks (brain MRIs) if needed. If 2D works, 3D should work as well.
 
 ## Experiments With Hybrid Layers
+(stayed tuned)
+
+
+ ## 3/14 update
+ ----------
+ The two-layer hybrid cnn now works! It took some tricks to make this network work:
+  - Had to define different forward passes with different covariate values
+  - At each iteration only one image can pass through the network so batch size can only be 1
+    - If we don't do this we'd have a `RuntimeError: boolean value of Tensor with more than one value is ambiguous`
+    - because we'd have multiple images but only one integer for the cov value
+  - No `nn.Sequential` containers because we need to customize forward passes; but that's fine because we're not really doing a two layer net anyway
+
+The TODOs remain the same for now; a few additional things:
 
 ## TODO
  - Modify the vgg net and replace the early layers with the hybrid conv layers
- - actually first we need to test if the hybrid layer can run let's just try it with a two-layer cnn (record results)
  - try plot the loss *while* training
  - saving checkpoint code should be changed - just name the checkpoint with the `experiment_name`
  - log training loss into a log file
  - save/load the dataloader to save time `torch.save(dataloader_obj, 'dataloader.pth')`
+ - Have this extendable to 3D conv layers because we're eventually going to work with ADNI images
