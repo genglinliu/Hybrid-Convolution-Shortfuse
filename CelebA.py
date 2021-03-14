@@ -75,7 +75,7 @@ def initialize_model(model_name, learning_rate, num_classes, device):
     return:
         model, loss function(criterion), optimizer
     """
-    # model = models.vgg16_bn(pretrained=True)                ############## add param here? ################
+    # model = models.vgg16(pretrained=True)                ############## add param here? ################
     # num_ftrs = model.classifier[6].in_features
     # model.classifier[6] = nn.Linear(num_ftrs, num_classes)
     
@@ -123,7 +123,8 @@ def train(train_loader, model, criterion, optimizer, num_epochs, device):
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-            # print
+            
+            # TODO: print AND log
             if (i+1) % 100 == 0:
                 print('Epoch: [{}/{}], Step[{}/{}], Loss:{:.4f}' \
                     .format(epoch+1, num_epochs, i+1, len(train_loader), loss.item()))
@@ -148,11 +149,16 @@ def evaluate(val_loader, model, device):
         for images, labels in val_loader:
 
             label = labels[:, 2]
+            cov_attr = labels[:, 20]    # gender (male/female)   
+            cov_attr = (cov_attr + 1) // 2  # map from {-1, 1} to {0, 1}
+            
             # again move to device first
             images = images.to(device)
             label = label.to(device)
+            
             # forward once
-            outputs = model(images)
+            outputs = model(images, cov_attr)    # model takes covariate here
+            
             # instead of calculating loss we will get predictions
             # it's essetially outputs just reformatting imo
             _, predicted = torch.max(outputs.data, 1)
@@ -160,7 +166,6 @@ def evaluate(val_loader, model, device):
             total += label.size(0) # yeah again, number of elements in the tensor
             correct += (label == predicted).sum().item()
 
-        # print
         print('Test accuracy on 10000 test images: {}%' \
                 .format(100 * correct / total))
     

@@ -3,3 +3,4 @@
 
 data/celeba/img_align_celeba*
 *.pyc
+*.pth

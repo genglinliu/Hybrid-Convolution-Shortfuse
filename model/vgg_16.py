@@ -1,11 +1,5 @@
 import torch
 import torch.nn as nn
-from .utils import load_state_dict_from_url # [todo] fix this before you run
-
-
-# __all__ = [
-#     'VGG', 'vgg16', 'vgg16_bn',
-# ]
 
 
 model_urls = {
@@ -13,10 +7,12 @@ model_urls = {
     'vgg16_bn': 'https://download.pytorch.org/models/vgg16_bn-6c64b313.pth',
 }
 
+model_path = "vgg16_pretrained.pth"
+
 
 class VGG(nn.Module):
 
-    def __init__(self, features, num_classes=1000, init_weights=True):
+    def __init__(self, features, num_classes=2, init_weights=True): # change to binary classifier
         super(VGG, self).__init__()
         self.features = features
         self.avgpool = nn.AdaptiveAvgPool2d((7, 7))
@@ -82,8 +78,7 @@ def _vgg(arch, cfg, batch_norm, pretrained, progress, **kwargs):
         kwargs['init_weights'] = False
     model = VGG(make_layers(cfgs[cfg], batch_norm=batch_norm), **kwargs)
     if pretrained:
-        state_dict = load_state_dict_from_url(model_urls[arch],
-                                              progress=progress)
+        state_dict = torch.load(model_path)
         model.load_state_dict(state_dict)
     return model
 

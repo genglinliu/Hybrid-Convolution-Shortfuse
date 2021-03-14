@@ -51,3 +51,4 @@ The TODOs remain the same for now; a few additional things:
  - log training loss into a log file
  - save/load the dataloader to save time `torch.save(dataloader_obj, 'dataloader.pth')`
  - Have this extendable to 3D conv layers because we're eventually going to work with ADNI images
+ - add F1 score as a performance measure
