@@ -7,12 +7,12 @@ model_urls = {
     'vgg16_bn': 'https://download.pytorch.org/models/vgg16_bn-6c64b313.pth',
 }
 
-model_path = "vgg16_pretrained.pth"
+model_path = "model/vgg16_pretrained.pth"
 
 
 class VGG(nn.Module):
 
-    def __init__(self, features, num_classes=2, init_weights=True): # change to binary classifier
+    def __init__(self, features, num_classes=1000, init_weights=True): # change to binary classifier
         super(VGG, self).__init__()
         self.features = features
         self.avgpool = nn.AdaptiveAvgPool2d((7, 7))
@@ -64,7 +64,7 @@ def make_layers(cfg, batch_norm=False):
             in_channels = v
     return nn.Sequential(*layers)
 
-
+# M means MaxPool
 cfgs = {
     'A': [64, 'M', 128, 'M', 256, 256, 'M', 512, 512, 'M', 512, 512, 'M'],
     'B': [64, 64, 'M', 128, 128, 'M', 256, 256, 'M', 512, 512, 'M', 512, 512, 'M'],
@@ -84,7 +84,7 @@ def _vgg(arch, cfg, batch_norm, pretrained, progress, **kwargs):
 
 
 def vgg16(pretrained=False, progress=True, **kwargs):
-    r"""VGG 16-layer model (configuration "D")
+    r""" (CUSTOMIZED) VGG 16-layer model (configuration "D")
     `"Very Deep Convolutional Networks For Large-Scale Image Recognition" <https://arxiv.org/pdf/1409.1556.pdf>`_
 
     Args:

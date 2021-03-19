@@ -21,6 +21,7 @@ import time
 
 from sklearn.metrics import f1_score
 
+from model.vgg_16 import *
 from model.hybrid_CNN import *
 
 
@@ -67,7 +68,7 @@ def load_data(batch_size):
     return train_loader, val_loader, test_loader
 
 
-def initialize_model(model_name, learning_rate, num_classes, device):
+def initialize_model(model, learning_rate, num_classes, device):
     """
     initialize the model (pretrained vgg16_bn)
     define loss function and optimizer and move data to gpu if available
@@ -75,11 +76,10 @@ def initialize_model(model_name, learning_rate, num_classes, device):
     return:
         model, loss function(criterion), optimizer
     """
-    # model = models.vgg16(pretrained=True)                ############## add param here? ################
-    # num_ftrs = model.classifier[6].in_features
-    # model.classifier[6] = nn.Linear(num_ftrs, num_classes)
     
-    model = model_name.to(device)
+    num_ftrs = model.classifier[6].in_features
+    model.classifier[6] = nn.Linear(num_ftrs, num_classes)
+    model = model.to(device)
     # Define loss function and optimizer
     criterion = nn.CrossEntropyLoss()
     # criterion = nn.BCELoss()
@@ -116,7 +116,8 @@ def train(train_loader, model, criterion, optimizer, num_epochs, device):
             label = label.to(device)
             
             # forward pass
-            outputs = model(images, cov_attr)    # model takes covariate here
+            outputs = model(images)
+            # outputs = model(images, cov_attr)    # model takes covariate here
             loss = criterion(outputs, label) 
             
             # backward
@@ -157,7 +158,8 @@ def evaluate(val_loader, model, device):
             label = label.to(device)
             
             # forward once
-            outputs = model(images, cov_attr)    # model takes covariate here
+            outputs = model(images)
+            # outputs = model(images, cov_attr)    # model takes covariate here
             
             # instead of calculating loss we will get predictions
             # it's essetially outputs just reformatting imo
@@ -171,14 +173,13 @@ def evaluate(val_loader, model, device):
     
     
 def main():
-    # hyper parameters
-    print("importing dependencies...")
-    
+    # hyper parameters    
     num_epochs = 1
     num_classes = 2
     batch_size = 1 # WE WANT IMAGES TO PASS HYBRID CONV LAYER ONE BY ONE
     learning_rate = 0.001
-    model_name = HybridConvNet()
+    # model_name = HybridConvNet()
+    model_name = vgg16(pretrained=True)
     
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     
