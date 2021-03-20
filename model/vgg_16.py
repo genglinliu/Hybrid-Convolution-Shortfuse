@@ -85,6 +85,7 @@ def _vgg(arch, cfg, batch_norm, pretrained, progress, **kwargs):
 
 def vgg16(pretrained=False, progress=True, **kwargs):
     r""" (CUSTOMIZED) VGG 16-layer model (configuration "D")
+    Takes in the cov paramter and forward function is customized
     `"Very Deep Convolutional Networks For Large-Scale Image Recognition" <https://arxiv.org/pdf/1409.1556.pdf>`_
 
     Args:

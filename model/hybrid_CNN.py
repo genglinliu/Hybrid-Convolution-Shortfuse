@@ -23,9 +23,14 @@ K_l = W_0 + W_1 * S_l
 
 """
 
+###################
+# Our hybrid layer
+###################
+
 class Hybrid_Conv2d(nn.Module):
     """    
     (self, channel_in, channel_out, kernel_size, stride=1, padding=0, cov=0)
+    kernel_size are 4d weights: (out_channel, in_channel, height, width)
     """    
     def __init__(self, channel_in, channel_out, kernel_size, stride=1, padding=0, cov=0):
         super(Hybrid_Conv2d, self).__init__()
@@ -50,6 +55,8 @@ class Hybrid_Conv2d(nn.Module):
         return out
     
     
+    
+# experiment with two layer CNN
     
 class HybridConvNet(nn.Module):
     """
@@ -84,7 +91,7 @@ class HybridConvNet(nn.Module):
     
 class ConvNet_v1(nn.Module):
     """
-    Simple two-layer CNN (this works)
+    Simple two-layer CNN with sequential container
     """
     def __init__(self):
         super(ConvNet_v1, self).__init__()
