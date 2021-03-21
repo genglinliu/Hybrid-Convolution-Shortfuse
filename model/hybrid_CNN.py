@@ -40,7 +40,7 @@ class Hybrid_Conv2d(nn.Module):
         self.stride = stride
         self.padding = padding
         self.cov = cov
-        
+        # initialization: gaussian random
         self.W_0 = nn.Parameter(torch.randn(kernel_size), requires_grad=True)
         self.W_1 = nn.Parameter(torch.randn(kernel_size), requires_grad=True)
  

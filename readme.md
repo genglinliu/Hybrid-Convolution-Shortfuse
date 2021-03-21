@@ -34,7 +34,6 @@ This will be adapted to 3D tasks (brain MRIs) if needed. If 2D works, 3D should 
 
 
  ## 3/14 update
- ----------
  The two-layer hybrid cnn now works! It took some tricks to make this network work:
   - Had to define different forward passes with different covariate values
   - At each iteration only one image can pass through the network so batch size can only be 1
@@ -52,3 +51,7 @@ The TODOs remain the same for now; a few additional things:
  - save/load the dataloader to save time `torch.save(dataloader_obj, 'dataloader.pth')`
  - Have this extendable to 3D conv layers because we're eventually going to work with ADNI images
  - add F1 score as a performance measure
+
+## 3/21 update
+ - So after researching online I found that it's not the best idea to pull the pytorch source code and modify it directly
+   rather, we should create our own model that extends VGG or just nn.Module and 
