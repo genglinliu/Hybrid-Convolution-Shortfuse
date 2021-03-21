@@ -1,5 +1,7 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
+
 from model.hybrid_CNN import Hybrid_Conv2d
 
 
@@ -111,12 +113,19 @@ def vgg16_bn(pretrained=False, progress=True, **kwargs):
 class MyVGG16(nn.Module):
     def __init__(self):
         super(MyVGG16, self).__init__()
-
+        # load pytorch vgg16 with pretrained weights
         vgg = vgg16(pretrained=True)
 
-        # Here you get the bottleneck/feature extractor
-        self.features = nn.Sequential(*list(vgg.children())[:-1])
-
+        # set the three blocks you need for forward pass
+        # remove the first conv layer + relu from the feature extractor
+        self.features = vgg.features[2:]
+        self.avgpool = vgg.avgpool
+        self.classifier = vgg.classifier
+        
+        # my precious baby hybrid layers
+        self.hybrid_conv1 = Hybrid_Conv2d(3, 16, kernel_size=(64, 3, 3, 3), cov=0) 
+        self.hybrid_conv2 = Hybrid_Conv2d(3, 16, kernel_size=(64, 3, 3, 3), cov=1)
+        
     # Set your own forward pass
     def forward(self, x, cov):
         if cov==0:
