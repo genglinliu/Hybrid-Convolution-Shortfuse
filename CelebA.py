@@ -92,7 +92,7 @@ def make_plots(step_hist, loss_hist, epoch=0):
     plt.xlabel('train_iterations')
     plt.ylabel('Loss')
     plt.title('epoch'+str(epoch+1))
-    plt.savefig('epoch_1')
+    plt.savefig('plot1')
     plt.clf()
 
 
@@ -107,17 +107,16 @@ def train(train_loader, model, criterion, optimizer, num_epochs, device):
         loss_hist = []
         step_hist = []
         for i, (images, labels) in tqdm(enumerate(train_loader)):
-            # move to gpu if available
             label = labels[:, 2]   # attractiveness label
             cov_attr = labels[:, 20]    # gender (male/female)   
             cov_attr = (cov_attr + 1) // 2  # map from {-1, 1} to {0, 1}
             
+            # move to gpu if available
             images = images.to(device)
             label = label.to(device)
             
             # forward pass
-            outputs = model(images)
-            # outputs = model(images, cov_attr)    # model takes covariate here
+            outputs = model(images, cov_attr)    # model takes covariate here
             loss = criterion(outputs, label) 
             
             # backward
@@ -134,7 +133,7 @@ def train(train_loader, model, criterion, optimizer, num_epochs, device):
         
         make_plots(step_hist, loss_hist, epoch)
         
-    torch.save(model.state_dict(), 'cnn1.ckpt')
+    torch.save(model.state_dict(), 'cnn_with_cov.ckpt')
 
 
 def evaluate(val_loader, model, device):
@@ -157,9 +156,8 @@ def evaluate(val_loader, model, device):
             images = images.to(device)
             label = label.to(device)
             
-            # forward once
-            outputs = model(images)
-            # outputs = model(images, cov_attr)    # model takes covariate here
+            # forward
+            outputs = model(images, cov_attr)
             
             # instead of calculating loss we will get predictions
             # it's essetially outputs just reformatting imo
@@ -168,8 +166,7 @@ def evaluate(val_loader, model, device):
             total += label.size(0) # yeah again, number of elements in the tensor
             correct += (label == predicted).sum().item()
 
-        print('Test accuracy on 10000 test images: {}%' \
-                .format(100 * correct / total))
+        print('Validation accuracy: {}%'.format(100 * correct / total))
     
     
 def main():
@@ -178,8 +175,7 @@ def main():
     num_classes = 2
     batch_size = 1 # WE WANT IMAGES TO PASS HYBRID CONV LAYER ONE BY ONE
     learning_rate = 0.001
-    # model_name = HybridConvNet()
-    model_name = vgg16(pretrained=True)
+    model_name = MyVGG16()
     
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     
