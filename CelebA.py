@@ -125,7 +125,7 @@ def train(train_loader, model, criterion, optimizer, num_epochs, device):
             optimizer.step()
             
             # TODO: print AND log
-            if (i+1) % 1000 == 0:
+            if (i+1) % 100 == 0:
                 print('Epoch: [{}/{}], Step[{}/{}], Loss:{:.4f}' \
                         .format(epoch+1, num_epochs, i+1, len(train_loader), loss.item()))
                 with open('output.txt', 'a') as f:
