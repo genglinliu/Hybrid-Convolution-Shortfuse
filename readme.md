@@ -30,8 +30,7 @@ ex. if the current training image has a label "male", then the conv parameter of
 This will be adapted to 3D tasks (brain MRIs) if needed. If 2D works, 3D should work as well.
 
 ## Experiments With Hybrid Layers
-(stayed tuned)
-
+First experiment terrible results - 0.52 val acc [with normal weight initialization]
 
  ## 3/14 update
  The two-layer hybrid cnn now works! It took some tricks to make this network work:
