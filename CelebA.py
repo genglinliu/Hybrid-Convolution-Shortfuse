@@ -116,7 +116,8 @@ def train(train_loader, model, criterion, optimizer, num_epochs, device):
             label = label.to(device)
             
             # forward pass
-            outputs = model(images, cov_attr)    # model takes covariate here
+            # outputs = model(images, cov_attr)    # model takes covariate here
+            outputs = model(images)
             loss = criterion(outputs, label) 
             
             # backward
@@ -160,8 +161,8 @@ def evaluate(val_loader, model, device):
             label = label.to(device)
             
             # forward
-            outputs = model(images, cov_attr)
-            
+            # outputs = model(images, cov_attr)
+            outputs = model(images)
             # instead of calculating loss we will get predictions
             # it's essetially outputs just reformatting imo
             _, predicted = torch.max(outputs.data, 1)
@@ -180,6 +181,7 @@ def main():
     batch_size = 1 # WE WANT IMAGES TO PASS HYBRID CONV LAYER ONE BY ONE
     learning_rate = 0.001
     model_name = MyVGG16()
+    # model_name = vgg16(pretrained=True)
     
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     

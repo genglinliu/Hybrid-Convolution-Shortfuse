@@ -131,7 +131,7 @@ class MyVGG16(nn.Module):
         self.hybrid_conv2 = Hybrid_Conv2d(3, 16, kernel_size=(64, 3, 3, 3), cov=1)
         
     # Set your own forward pass
-    def forward(self, x, cov):
+    def forward(self, x, cov=0):
         if cov==0:
             x = F.relu(self.hybrid_conv1(x))
             x = self.features(x)
@@ -146,31 +146,3 @@ class MyVGG16(nn.Module):
             x = torch.flatten(x, 1)
             x = self.classifier(x)
             return x
-
-
-
-
-# # https://discuss.pytorch.org/t/how-can-i-replace-the-forward-method-of-a-predefined-torchvision-model-with-my-customized-forward-function/54224/6
-# class MyVGG16(VGG):
-#     def __init__(self, features):
-#         super(MyVGG16, self).__init__(features)
-#         self.features = features [2:]
-#         # my precious hybrid layers
-#         self.hybrid_conv1 = Hybrid_Conv2d(3, 16, kernel_size=(16, 3, 3, 3), cov=0) 
-#         self.hybrid_conv2 = Hybrid_Conv2d(3, 16, kernel_size=(16, 3, 3, 3), cov=1)
-
-#     def forward(self, x, cov):
-#         if cov==0:
-#             x = F.relu(self.hybrid_conv1(x))
-#             x = self.features(x)
-#             x = self.avgpool(x)
-#             x = torch.flatten(x, 1)
-#             x = self.classifier(x)
-#             return x
-#         elif cov==1:
-#             x = F.relu(self.hybrid_conv2(x))
-#             x = self.features(x)
-#             x = self.avgpool(x)
-#             x = torch.flatten(x, 1)
-#             x = self.classifier(x)
-#             return x
