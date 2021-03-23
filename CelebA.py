@@ -125,9 +125,10 @@ def train(train_loader, model, criterion, optimizer, num_epochs, device):
             optimizer.step()
             
             # TODO: print AND log
-            if (i+1) % 100 == 0:
-                print('Epoch: [{}/{}], Step[{}/{}], Loss:{:.4f}' \
-                    .format(epoch+1, num_epochs, i+1, len(train_loader), loss.item()))
+            if (i+1) % 1000 == 0:
+                with open('output.txt', 'a') as f:
+                    print('Epoch: [{}/{}], Step[{}/{}], Loss:{:.4f}' \
+                        .format(epoch+1, num_epochs, i+1, len(train_loader), loss.item()), file=f)
                 loss_hist.append(loss.item())
                 step_hist.append(i+1)
         
@@ -165,8 +166,8 @@ def evaluate(val_loader, model, device):
             # accumulate stats
             total += label.size(0) # yeah again, number of elements in the tensor
             correct += (label == predicted).sum().item()
-
-        print('Validation accuracy: {}%'.format(100 * correct / total))
+        with open('output.txt', 'a') as f:
+            print('Validation accuracy: {}%'.format(100 * correct / total), file=f)
     
     
 def main():

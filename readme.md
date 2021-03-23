@@ -46,7 +46,7 @@ The TODOs remain the same for now; a few additional things:
  - Modify the vgg net and replace the early layers with the hybrid conv layers
  - try plot the loss *while* training
  - saving checkpoint code should be changed - just name the checkpoint with the `experiment_name`
- - log training loss into a log file
+ - log training loss into a log file [done]
  - save/load the dataloader to save time `torch.save(dataloader_obj, 'dataloader.pth')`
  - Have this extendable to 3D conv layers because we're eventually going to work with ADNI images
  - add F1 score as a performance measure
