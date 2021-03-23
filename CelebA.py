@@ -185,7 +185,7 @@ def main():
     
     print("Initializing model...")
     model, criterion, optimizer = initialize_model(model_name, learning_rate, num_classes, device)
-    
+   
     print("Start training... \n")
     train(train_loader, model, criterion, optimizer, num_epochs, device)
     
