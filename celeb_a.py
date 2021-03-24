@@ -103,7 +103,7 @@ def train(train_loader, model, criterion, optimizer, num_epochs, device):
         plt.savefig('epoch_1')
         plt.clf()
         
-    torch.save(model.state_dict(), 'cnn.ckpt')
+    torch.save(model.state_dict(), 'vgg16_v1.ckpt')
 
 
 def evaluate(val_loader, model, device):
