@@ -54,3 +54,11 @@ The TODOs remain the same for now; a few additional things:
 ## 3/21 update
  - So after researching online I found that it's not the best idea to pull the pytorch source code and modify it directly
    rather, we should create our own model that extends VGG or just nn.Module and 
+
+## 3/23 update
+ - there are most likely something wrong with the other parts of the code after running three experiements on titanX
+ - set s=0 for all cov for vgg with hybrid layers, batchsize=1 - 0.52
+ - regular vgg16 with batchsize=1  => val acc = 0.48
+ - regualr vgg16 with batchsize=8  => val acc = 0.52 (exactly the same as exp1 which is even more strange)
+   - this used to be 0.78-0.79
+ - loss oscillates between 0.6x-0.7x
