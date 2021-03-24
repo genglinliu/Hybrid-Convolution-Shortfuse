@@ -144,7 +144,10 @@ def evaluate(val_loader, model, device):
     """
     Run the validation set on the trained model
     """
-    model.eval() # BatchNorm uses moving mean/variance instead of mini-batch mean/variance
+    model_path = "model/cnn.ckpt"
+    state_dict = torch.load(model_path)
+    model.load_state_dict(state_dict)
+    model.eval() 
     with torch.no_grad():
         # initialize the stats
         correct = 0
@@ -180,8 +183,9 @@ def main():
     num_classes = 2
     batch_size = 1 # WE WANT IMAGES TO PASS HYBRID CONV LAYER ONE BY ONE
     learning_rate = 0.001
-    model_name = MyVGG16()
+    # model_name = MyVGG16()
     # model_name = vgg16(pretrained=True)
+    model_name = models.vgg16_bn(pretrained=True)
     
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     
@@ -191,8 +195,8 @@ def main():
     print("Initializing model...")
     model, criterion, optimizer = initialize_model(model_name, learning_rate, num_classes, device)
    
-    print("Start training... \n")
-    train(train_loader, model, criterion, optimizer, num_epochs, device)
+    # print("Start training... \n")
+    # train(train_loader, model, criterion, optimizer, num_epochs, device)
     
     print("Start evaluating... \n")
     evaluate(val_loader, model, device)    
