@@ -1,2 +1,4 @@
-
-cnn.ckpt
+*.ckpt
+/data
+*pyc
+*.pth
