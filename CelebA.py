@@ -24,6 +24,8 @@ from sklearn.metrics import f1_score
 from model.vgg_16 import *
 from model.hybrid_CNN import *
 
+experiment_name = 'vgg16_bn_32'
+device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 
 # get dataset
@@ -68,7 +70,7 @@ def load_data(batch_size):
     return train_loader, val_loader, test_loader
 
 
-def initialize_model(model, learning_rate, num_classes, device):
+def initialize_model(model, learning_rate, num_classes):
     """
     initialize the model (pretrained vgg16_bn)
     define loss function and optimizer and move data to gpu if available
@@ -80,10 +82,10 @@ def initialize_model(model, learning_rate, num_classes, device):
     num_ftrs = model.classifier[6].in_features
     model.classifier[6] = nn.Linear(num_ftrs, num_classes)
     model = model.to(device)
+    
     # Define loss function and optimizer
     criterion = nn.CrossEntropyLoss()
     # criterion = nn.BCELoss()
-
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
     return model, criterion, optimizer
 
@@ -92,11 +94,11 @@ def make_plots(step_hist, loss_hist, epoch=0):
     plt.xlabel('train_iterations')
     plt.ylabel('Loss')
     plt.title('epoch'+str(epoch+1))
-    plt.savefig('plot1')
+    plt.savefig(experiment_name)
     plt.clf()
 
 
-def train(train_loader, model, criterion, optimizer, num_epochs, device):
+def train(train_loader, model, criterion, optimizer, num_epochs):
     """
     Move data to GPU memory and train for specified number of epochs
     Also plot the loss function and save it in `Figures/`
@@ -125,11 +127,10 @@ def train(train_loader, model, criterion, optimizer, num_epochs, device):
             loss.backward()
             optimizer.step()
             
-            # TODO: print AND log
             if (i+1) % 100 == 0:
                 print('Epoch: [{}/{}], Step[{}/{}], Loss:{:.4f}' \
                         .format(epoch+1, num_epochs, i+1, len(train_loader), loss.item()))
-                with open('output.txt', 'a') as f:
+                with open(experiment_name+'.txt', 'a') as f:
                     print('Epoch: [{}/{}], Step[{}/{}], Loss:{:.4f}' \
                         .format(epoch+1, num_epochs, i+1, len(train_loader), loss.item()), file=f)
                 loss_hist.append(loss.item())
@@ -137,24 +138,23 @@ def train(train_loader, model, criterion, optimizer, num_epochs, device):
         
         make_plots(step_hist, loss_hist, epoch)
         
-    torch.save(model.state_dict(), 'cnn_with_cov.ckpt')
+    torch.save(model.state_dict(), experiment_name+'.ckpt')
 
 
-def evaluate(val_loader, model, device):
+def evaluate(val_loader, model):
     """
     Run the validation set on the trained model
     """
-    model_path = "model/cnn.ckpt"
-    state_dict = torch.load(model_path)
-    model.load_state_dict(state_dict)
+    # uncomment if you want to load from checkpoint
+    # model_path = "model/cnn.ckpt"
+    # state_dict = torch.load(model_path)
+    # model.load_state_dict(state_dict)
+    
     model.eval() 
     with torch.no_grad():
-        # initialize the stats
         correct = 0
         total = 0
-        # pass through testing data once
         for images, labels in val_loader:
-
             label = labels[:, 2]
             cov_attr = labels[:, 20]    # gender (male/female)   
             cov_attr = (cov_attr + 1) // 2  # map from {-1, 1} to {0, 1}
@@ -172,7 +172,7 @@ def evaluate(val_loader, model, device):
             total += label.size(0) # yeah again, number of elements in the tensor
             correct += (label == predicted).sum().item()
         print('Validation accuracy: {}%'.format(100 * correct / total))
-        with open('output.txt', 'a') as f:
+        with open(experiment_name+'.txt', 'a') as f:
             print('Validation accuracy: {}%'.format(100 * correct / total), file=f)
     
     
@@ -180,25 +180,22 @@ def main():
     # hyper parameters    
     num_epochs = 1
     num_classes = 2
-    batch_size = 1 # WE WANT IMAGES TO PASS HYBRID CONV LAYER ONE BY ONE
+    batch_size = 32 # WE WANT IMAGES TO PASS HYBRID CONV LAYER ONE BY ONE
     learning_rate = 0.001
     # model_name = MyVGG16()
-    # model_name = vgg16(pretrained=True)
     model_name = models.vgg16_bn(pretrained=True)
-    
-    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     
     print("Loading data...")
     train_loader, val_loader, test_loader = load_data(batch_size)
     
     print("Initializing model...")
-    model, criterion, optimizer = initialize_model(model_name, learning_rate, num_classes, device)
+    model, criterion, optimizer = initialize_model(model_name, learning_rate, num_classes)
    
     print("Start training... \n")
-    train(train_loader, model, criterion, optimizer, num_epochs, device)
+    train(train_loader, model, criterion, optimizer, num_epochs)
     
     print("Start evaluating... \n")
-    evaluate(val_loader, model, device)    
+    evaluate(val_loader, model)    
 
 if __name__ == "__main__":
     main()

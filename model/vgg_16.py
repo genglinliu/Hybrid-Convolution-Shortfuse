@@ -7,10 +7,13 @@ from model.hybrid_CNN import Hybrid_Conv2d
 
 model_urls = {
     'vgg16': 'https://download.pytorch.org/models/vgg16-397923af.pth',
-    'vgg16_bn': 'https://download.pytorch.org/models/vgg16_bn-6c64b313.pth',
+    'vgg16_bn': 'https://download.pytorch.org/models/vgg16_bn-6c64b313.pth'
 }
 
-model_path = "model/vgg16_pretrained.pth"
+model_path = {
+    'vgg16': 'model/vgg16_pretrained.pth',
+    'vgg16_bn': 'model/vgg16_bn_pretrained.pth'
+}
 
 
 class VGG(nn.Module):
@@ -85,7 +88,7 @@ def _vgg(arch, cfg, batch_norm, pretrained, progress, **kwargs):
         kwargs['init_weights'] = False
     model = VGG(make_layers(cfgs[cfg], batch_norm=batch_norm), **kwargs)
     if pretrained:
-        state_dict = torch.load(model_path)
+        state_dict = torch.load(model_path[arch])
         model.load_state_dict(state_dict)
     return model
 

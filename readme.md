@@ -62,3 +62,38 @@ The TODOs remain the same for now; a few additional things:
  - regualr vgg16 with batchsize=8  => val acc = 0.52 (exactly the same as exp1 which is even more strange)
    - this used to be 0.78-0.79
  - loss oscillates between 0.6x-0.7x
+
+## 3/24 update
+I thought the script had problems so I went back to commit `bfa4b43` and checked out in another branch and pulled the old `celeb_a.py` script.
+Then I ran the following experiments:
+
+exp1: vgg16_bn  batchsize=16  old script  [val acc = 0.783] - finished under 1 hour
+exp2: vgg16     batchsize=16  old script  [val acc = 0.5200583882820758] - ocsillating training loss
+exp3: vgg16     bacthsize=1   old script  [val acc = 0.5200583882820758] - unstable training
+exp4: vgg16_bn  batchsize=1   old script  [val acc = 0.4799416117179242] -  gradient vanished
+exp5: vgg16_bn  batchsize=16  new script  [val acc = 0.791]
+
+And so I realized the problem was probably that I gave up on vgg16_bn when I thought my hybrid layer couldn't handle minibacthes.
+From the experiments we can see how important BatchNorm is for our task. If we have pure SGD then we can't use BN.
+Now I know that it is crucial to first enable the hybrid layers 
+
+So right now the **TODO** is make hybrid layers take batch inputs and run it with vgg16_bn
+
+ps to debug locally maybe you can load just the val set AS training set? To figure out shapes and stuff
+That way we may be able to avoid the CUDA out of memory error
+
+### TODOs
+ - make hybrid layers take batch inputs and run it with vgg16_bn
+   - You're going to find this in F.Conv2d (input, weight, bias, ...) where input = (minibatch,in_channels,iH,iW)
+ - get local .pth for vgg16_bn
+ - Make config yaml file or something to make experiments easier to perform 
+ - add f1 score as metrics
+ - 52.00583882820758% -- I want to know where exactly this number came from (it happens whenever I have vgg16 without BN)
+   - I suspect that somehow this is because at eval time the model is predicting all 1 or all 0; this is just so strange
+   - why would BN have THIS much of an effect?
+   - Is there any way to visualize the training? 
+
+More exp:
+ exp1: batchsize=32
+ exp2: batchsize=64
+ 
