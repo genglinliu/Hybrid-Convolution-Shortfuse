@@ -154,6 +154,8 @@ def evaluate(val_loader, model):
     with torch.no_grad():
         correct = 0
         total = 0
+        y_true = []
+        y_pred = []
         for images, labels in val_loader:
             label = labels[:, 2]
             cov_attr = labels[:, 20]    # gender (male/female)   
@@ -166,14 +168,19 @@ def evaluate(val_loader, model):
             # forward
             # outputs = model(images, cov_attr)
             outputs = model(images)
-            _, predicted = torch.max(outputs.data, 1)
+            _, predicted = torch.max(outputs.data, 1) # dim=1
             
             # accumulate stats
+            y_true.append(label)
+            y_pred.append(predicted)
             total += label.size(0) # yeah again, number of elements in the tensor
             correct += (label == predicted).sum().item()
-        print('Validation accuracy: {}%'.format(100 * correct / total))
+        
+        print('F1 Score: {}'.format(f1_score(y_true, y_pred)))
+        print('Validation accuracy: {}'.format(correct / total))
         with open(experiment_name+'.txt', 'a') as f:
-            print('Validation accuracy: {}%'.format(100 * correct / total), file=f)
+            print('F1 Score: {}'.format(f1_score(y_true, y_pred)))
+            print('Validation accuracy: {}'.format(correct / total), file=f)
     
     
 def main():
