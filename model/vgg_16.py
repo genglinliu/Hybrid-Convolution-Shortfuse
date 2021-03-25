@@ -47,10 +47,6 @@ class VGG(nn.Module):
                 nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
                 if m.bias is not None:
                     nn.init.constant_(m.bias, 0)
-            elif isinstance(m, Hybrid_Conv2d):
-                nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
-                if m.bias is not None:
-                    nn.init.constant_(m.bias, 0)
             elif isinstance(m, nn.BatchNorm2d):
                 nn.init.constant_(m.weight, 1)
                 nn.init.constant_(m.bias, 0)
@@ -75,18 +71,13 @@ def make_layers(cfg, batch_norm=False):
     return nn.Sequential(*layers)
 
 # M means MaxPool
-cfgs = {
-    'A': [64, 'M', 128, 'M', 256, 256, 'M', 512, 512, 'M', 512, 512, 'M'],
-    'B': [64, 64, 'M', 128, 128, 'M', 256, 256, 'M', 512, 512, 'M', 512, 512, 'M'],
-    'D': [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 'M', 512, 512, 512, 'M', 512, 512, 512, 'M'],
-    'E': [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 256, 'M', 512, 512, 512, 512, 'M', 512, 512, 512, 512, 'M'],
-}
+cfg = [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 'M', 512, 512, 512, 'M', 512, 512, 512, 'M']
 
 
 def _vgg(arch, cfg, batch_norm, pretrained, progress, **kwargs):
     if pretrained:
         kwargs['init_weights'] = False
-    model = VGG(make_layers(cfgs[cfg], batch_norm=batch_norm), **kwargs)
+    model = VGG(make_layers(cfg, batch_norm=batch_norm), **kwargs)
     if pretrained:
         state_dict = torch.load(model_path[arch])
         model.load_state_dict(state_dict)
@@ -94,7 +85,7 @@ def _vgg(arch, cfg, batch_norm, pretrained, progress, **kwargs):
 
 
 def vgg16(pretrained=False, progress=True, **kwargs):
-    r""" (CUSTOMIZED) VGG 16-layer model (configuration "D")
+    """ (CUSTOMIZED) VGG 16-layer model (configuration "D")
     Takes in the cov paramter and forward function is customized
     `"Very Deep Convolutional Networks For Large-Scale Image Recognition" <https://arxiv.org/pdf/1409.1556.pdf>`_
 
@@ -102,18 +93,18 @@ def vgg16(pretrained=False, progress=True, **kwargs):
         pretrained (bool): If True, returns a model pre-trained on ImageNet
         progress (bool): If True, displays a progress bar of the download to stderr
     """
-    return _vgg('vgg16', 'D', False, pretrained, progress, **kwargs)
+    return _vgg('vgg16', cfg, False, pretrained, progress, **kwargs)
 
 
 def vgg16_bn(pretrained=False, progress=True, **kwargs):
-    r"""VGG 16-layer model (configuration "D") with batch normalization
+    """ (CUSTOMIZED) VGG 16-layer model (configuration "D") with batch normalization
     `"Very Deep Convolutional Networks For Large-Scale Image Recognition" <https://arxiv.org/pdf/1409.1556.pdf>`_
 
     Args:
         pretrained (bool): If True, returns a model pre-trained on ImageNet
         progress (bool): If True, displays a progress bar of the download to stderr
     """
-    return _vgg('vgg16_bn', 'D', True, pretrained, progress, **kwargs)
+    return _vgg('vgg16_bn', cfg, True, pretrained, progress, **kwargs)
 
 
 

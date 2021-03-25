@@ -43,6 +43,12 @@ class Hybrid_Conv2d(nn.Module):
         # initialization: gaussian random
         self.W_0 = nn.Parameter(torch.randn(kernel_size), requires_grad=True)
         self.W_1 = nn.Parameter(torch.randn(kernel_size), requires_grad=True)
+        self._initialize_weights()
+        
+    # weight initialization
+    def _initialize_weights(self):
+        nn.init.kaiming_normal_(self.W_0, mode='fan_out', nonlinearity='relu')
+        nn.init.kaiming_normal_(self.W_1, mode='fan_out', nonlinearity='relu')
  
     def forward(self, x):
         

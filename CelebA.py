@@ -183,7 +183,7 @@ def main():
     batch_size = 8
     learning_rate = 0.001
     # model_name = MyVGG16()
-    model_name = models.vgg16_bn(pretrained=True)
+    model_name = vgg16_bn(pretrained=True)
     
     print("Loading data...")
     train_loader, val_loader, test_loader = load_data(batch_size)
