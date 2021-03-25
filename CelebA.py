@@ -24,7 +24,7 @@ from sklearn.metrics import f1_score
 from model.vgg_16 import *
 from model.hybrid_CNN import *
 
-experiment_name = 'vgg16_bn_32'
+experiment_name = 'vgg16_bn_8'
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 
@@ -180,7 +180,7 @@ def main():
     # hyper parameters    
     num_epochs = 1
     num_classes = 2
-    batch_size = 32 # WE WANT IMAGES TO PASS HYBRID CONV LAYER ONE BY ONE
+    batch_size = 8
     learning_rate = 0.001
     # model_name = MyVGG16()
     model_name = models.vgg16_bn(pretrained=True)

@@ -82,18 +82,15 @@ So right now the **TODO** is make hybrid layers take batch inputs and run it wit
 ps to debug locally maybe you can load just the val set AS training set? To figure out shapes and stuff
 That way we may be able to avoid the CUDA out of memory error
 
+0.4799416117179242 and 0.5200583882820758 - that's just the model predicting all 0's or 1's. Why？
+We now see how much BatchNorm helps stablize training - we will try more batchsizes and find the best one
+
 ### TODOs
  - make hybrid layers take batch inputs and run it with vgg16_bn
    - You're going to find this in F.Conv2d (input, weight, bias, ...) where input = (minibatch,in_channels,iH,iW)
- - get local .pth for vgg16_bn
- - Make config yaml file or something to make experiments easier to perform 
  - add f1 score as metrics
- - 52.00583882820758% -- I want to know where exactly this number came from (it happens whenever I have vgg16 without BN)
-   - I suspect that somehow this is because at eval time the model is predicting all 1 or all 0; this is just so strange
-   - why would BN have THIS much of an effect?
-   - Is there any way to visualize the training? 
+ - at one point you will have to revisit the eval code, maybe add cross validation etc
 
 More exp:
  exp1: batchsize=32
  exp2: batchsize=64
- 
