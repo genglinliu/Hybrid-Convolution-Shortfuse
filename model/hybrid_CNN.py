@@ -32,14 +32,14 @@ class Hybrid_Conv2d(nn.Module):
     (self, channel_in, channel_out, kernel_size, stride=1, padding=0, cov=0)
     kernel_size are 4d weights: (out_channel, in_channel, height, width)
     """    
-    def __init__(self, channel_in, channel_out, kernel_size, stride=1, padding=0, cov=0):
+    def __init__(self, channel_in, channel_out, kernel_size, stride=1, padding=0, cov):
         super(Hybrid_Conv2d, self).__init__()
         self.kernel_size = kernel_size # 4D weight (out_channel, in_channel, height, width)
         self.channel_in = channel_in
         self.channel_out = channel_out
         self.stride = stride
         self.padding = padding
-        self.cov = cov
+        self.cov = cov  # cov is a tensor of shape = (minibatch,)
         # initialization: gaussian random
         self.W_0 = nn.Parameter(torch.randn(kernel_size), requires_grad=True)
         self.W_1 = nn.Parameter(torch.randn(kernel_size), requires_grad=True)
@@ -51,7 +51,7 @@ class Hybrid_Conv2d(nn.Module):
         nn.init.kaiming_normal_(self.W_1, mode='fan_out', nonlinearity='relu')
  
     def forward(self, x):
-        
+        # input x is of shape = (minibatch, channel=3, width, height) e.g. (32, 3, 224, 224)
         cov = self.cov 
         W_0 = self.W_0
         W_1 = self.W_1
