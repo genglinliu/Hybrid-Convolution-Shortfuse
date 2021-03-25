@@ -146,9 +146,9 @@ def evaluate(val_loader, model):
     Run the validation set on the trained model
     """
     # uncomment if you want to load from checkpoint
-    # model_path = "model/cnn.ckpt"
-    # state_dict = torch.load(model_path)
-    # model.load_state_dict(state_dict)
+    model_path = "model/vgg16_bn_32.ckpt"
+    state_dict = torch.load(model_path)
+    model.load_state_dict(state_dict)
     
     model.eval() 
     with torch.no_grad():
@@ -156,7 +156,7 @@ def evaluate(val_loader, model):
         total = 0
         y_true = []
         y_pred = []
-        for images, labels in val_loader:
+        for images, labels in tqdm(val_loader):
             label = labels[:, 2]
             cov_attr = labels[:, 20]    # gender (male/female)   
             cov_attr = (cov_attr + 1) // 2  # map from {-1, 1} to {0, 1}
@@ -198,8 +198,8 @@ def main():
     print("Initializing model...")
     model, criterion, optimizer = initialize_model(model_name, learning_rate, num_classes)
    
-    print("Start training... \n")
-    train(train_loader, model, criterion, optimizer, num_epochs)
+    # print("Start training... \n")
+    # train(train_loader, model, criterion, optimizer, num_epochs)
     
     print("Start evaluating... \n")
     evaluate(val_loader, model)    
