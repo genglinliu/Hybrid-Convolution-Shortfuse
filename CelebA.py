@@ -146,9 +146,9 @@ def evaluate(val_loader, model):
     Run the validation set on the trained model
     """
     # uncomment if you want to load from checkpoint
-    model_path = "model/vgg16_bn_32.ckpt"
-    state_dict = torch.load(model_path)
-    model.load_state_dict(state_dict)
+    # model_path = "model/vgg16_bn_32.ckpt"
+    # state_dict = torch.load(model_path)
+    # model.load_state_dict(state_dict)
     
     model.eval() 
     with torch.no_grad():
@@ -171,8 +171,8 @@ def evaluate(val_loader, model):
             _, predicted = torch.max(outputs.data, 1) # dim=1
             
             # accumulate stats
-            y_true.append(label)
-            y_pred.append(predicted)
+            y_true.append(label.item()) # in the one
+            y_pred.append(predicted.item())
             total += label.size(0) # yeah again, number of elements in the tensor
             correct += (label == predicted).sum().item()
         

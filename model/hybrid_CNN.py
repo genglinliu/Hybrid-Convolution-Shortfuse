@@ -52,7 +52,7 @@ class Hybrid_Conv2d(nn.Module):
  
     def forward(self, x):
         # input x is of shape = (minibatch, channel=3, width, height) e.g. (32, 3, 224, 224)
-        cov = self.cov 
+        cov = self.cov # (minibatch,)
         W_0 = self.W_0
         W_1 = self.W_1
         
