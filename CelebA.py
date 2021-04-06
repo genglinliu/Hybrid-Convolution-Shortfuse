@@ -12,7 +12,7 @@ import torchvision
 from torchvision import models, transforms, datasets
 
 import torch.optim as optim
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, Subset
 
 import PIL.Image as Image
 from tqdm import tqdm
@@ -55,15 +55,23 @@ def load_data(batch_size):
                                     target_type='attr',
                                     transform=transform,
                                     download=False)
+    
+    indices_train = list(range(700))
+    indices_val = list(range(150))    
+    indices_test = list(range(150))
+    
+    train_subset = Subset(train_dataset, indices_train)
+    val_subset = Subset(train_dataset, indices_val)
+    test_subset = Subset(test_dataset, indices_test)
 
     # data loader
-    train_loader = DataLoader(dataset=train_dataset,
+    train_loader = DataLoader(dataset=train_subset,
                                 batch_size=batch_size,
                                 shuffle=True)
-    val_loader = DataLoader(dataset=val_dataset,
+    val_loader = DataLoader(dataset=val_subset,
                                 batch_size=batch_size,
                                 shuffle=False)
-    test_loader = DataLoader(dataset=test_dataset,
+    test_loader = DataLoader(dataset=test_subset,
                                 batch_size=batch_size,
                                 shuffle=False)
     
@@ -189,7 +197,6 @@ def main():
     num_classes = 2
     batch_size = 8
     learning_rate = 0.001
-    # model_name = MyVGG16()
     model_name = vgg16_bn(pretrained=True)
     
     print("Loading data...")
@@ -198,8 +205,8 @@ def main():
     print("Initializing model...")
     model, criterion, optimizer = initialize_model(model_name, learning_rate, num_classes)
    
-    # print("Start training... \n")
-    # train(train_loader, model, criterion, optimizer, num_epochs)
+    print("Start training... \n")
+    train(train_loader, model, criterion, optimizer, num_epochs)
     
     print("Start evaluating... \n")
     evaluate(val_loader, model)    

@@ -34,14 +34,14 @@ class Hybrid_Conv2d(nn.Module):
     (self, channel_in, channel_out, kernel_size, stride=1, padding=0, cov=0)
     kernel_size are 4d weights: (out_channel, in_channel, height, width)
     """    
-    def __init__(self, channel_in, channel_out, kernel_size, stride=1, padding=0, cov):
+    def __init__(self, channel_in, channel_out, kernel_size, stride=1, padding=0, cov=0):
         super(Hybrid_Conv2d, self).__init__()
         self.kernel_size = kernel_size # 4D weight (out_channel, in_channel, height, width)
         self.channel_in = channel_in
         self.channel_out = channel_out
         self.stride = stride
         self.padding = padding
-        self.cov = cov  # cov vector of shape = (minibatch,)
+        self.cov = cov  # currently a scalar; cov vector of shape = (minibatch,)
         
         # initialization: gaussian random
         self.W_0 = nn.Parameter(torch.randn(kernel_size), requires_grad=True)
