@@ -94,3 +94,7 @@ We now see how much BatchNorm helps stablize training - we will try more batchsi
 More exp:
  exp1: batchsize=32
  exp2: batchsize=64
+
+## 4/6 updates
+
+TODOs: For each minibatch of size N, with the kernel param W0 and W1, you first convolve each data point in the minibatch with either W0 or W0+W1 (depend on the covariate), then you concat all the output of N convolution, do batchnorm

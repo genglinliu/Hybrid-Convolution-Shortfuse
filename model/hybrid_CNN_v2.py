@@ -23,6 +23,9 @@ K_l = W_0 + W_1 * S_l
 
 When S_l is a batch input, kernel param k_l still needs to be updated per data point (image)
 So we need to handle that
+
+
+
 """
 
 ###################
