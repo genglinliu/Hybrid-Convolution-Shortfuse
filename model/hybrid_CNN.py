@@ -4,25 +4,17 @@ import torch.nn.functional as F
 
 
 """
-You got a d-dim covaraite vector as input
-K_l = W_0 + W_1 * S_l
+A d-dim covaraite vector S as input
 
-S_0 = male (1)
-S_1 = female (0)
+K_l = W_0 + W_1 * S_l 
+where S_l is one of the scalar entries of S. it is either 0 (female) or 1 (male)
 
-for i, (images, labels) in enumerate(train_loader):
-    labels = labels[:, 2] # attractiveness label
+When S is a batch input, kernel param k_l still needs to be updated per data point (image)
 
-The rest is just tensor computation
+Solution: For each minibatch of size N, with the kernel param W0 and W1, 
+first convolve each data point in the minibatch with either W_0 or W_0+W_1 (depend on the covariate), 
+then you concat all the output of N convolution, do batchnorm
 
-on every iteration, only one image sample passes through the hybrid layer
-so we pass in this one scaler (1 or -1) to the hybrid layer as a parameter
-We define s_l as a scaler, so the '1' samples will make w_1 activate
-
-K_l = W_0 + W_1 * S_l
-
-When S_l is a batch input, kernel param k_l still needs to be updated per data point (image)
-So we need to handle that
 """
 
 ###################
@@ -31,28 +23,20 @@ So we need to handle that
 
 class Hybrid_Conv2d(nn.Module):
     """    
-    (self, channel_in, channel_out, kernel_size, stride=1, padding=0, cov=0)
+    (self, channel_in, channel_out, kernel_size, cov, stride=1, padding=0)
     kernel_size are 4d weights: (out_channel, in_channel, height, width)
     """    
-    def __init__(self, channel_in, channel_out, kernel_size, stride=1, padding=0, cov=0):
+    def __init__(self, channel_in, channel_out, kernel_size, cov, stride=1, padding=0):
         super(Hybrid_Conv2d, self).__init__()
         self.kernel_size = kernel_size # 4D weight (out_channel, in_channel, height, width)
         self.channel_in = channel_in
         self.channel_out = channel_out
         self.stride = stride
         self.padding = padding
-        self.cov = cov  # currently a scalar; cov vector of shape = (minibatch,)
-        
-        # initialization: gaussian random
+        self.cov = cov  # cov vector of shape = (minibatch,)
+
         self.W_0 = nn.Parameter(torch.randn(kernel_size), requires_grad=True)
-        self.W_1 = nn.Parameter(torch.randn(kernel_size), requires_grad=True)
-        
-        # N = cov.shape[0] # length of covariate vector is the batchsize
-        # weights = []
-        # for _ in range(N):
-        #     weight = nn.Parameter(torch.randn(15, 3, 5, 5))
-        #     weights.append(weight)
-        
+        self.W_1 = nn.Parameter(torch.randn(kernel_size), requires_grad=True)        
         self._initialize_weights()
         
     # weight initialization
@@ -60,15 +44,19 @@ class Hybrid_Conv2d(nn.Module):
         nn.init.kaiming_normal_(self.W_0, mode='fan_out', nonlinearity='relu')
         nn.init.kaiming_normal_(self.W_1, mode='fan_out', nonlinearity='relu')
  
-    def forward(self, x):
+    def forward(self, x, cov):
         # input x is of shape = (minibatch, channel=3, width, height) e.g. (32, 3, 224, 224)
         cov = self.cov # (minibatch,)
         W_0 = self.W_0
         W_1 = self.W_1
         
-        kernel = W_0 + torch.mul(W_1, cov)
-        out = F.conv2d(x, kernel, stride=self.stride, padding=self.padding)
-        return out
+        outputs = []
+        for s_l in cov: # s_l is the scalar covariate per data point
+            kernel = W_0 + torch.mul(W_1, s_l)       
+            out = F.conv2d(x, kernel, stride=self.stride, padding=self.padding)
+            outputs.append(out) 
+        
+        return outputs
     
     
     

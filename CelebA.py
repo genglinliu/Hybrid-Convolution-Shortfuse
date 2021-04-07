@@ -21,10 +21,10 @@ import time
 
 from sklearn.metrics import f1_score
 
-from model.vgg_16 import *
-from model.hybrid_CNN import *
+from model.vgg16 import *
+from model.hybrid_CNN import Hybrid_Conv2d
 
-experiment_name = 'vgg16_bn_8'
+experiment_name = 'vgg16_bn_8_testing'
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 
@@ -135,7 +135,7 @@ def train(train_loader, model, criterion, optimizer, num_epochs):
             loss.backward()
             optimizer.step()
             
-            if (i+1) % 100 == 0:
+            if (i+1) % 10 == 0:
                 print('Epoch: [{}/{}], Step[{}/{}], Loss:{:.4f}' \
                         .format(epoch+1, num_epochs, i+1, len(train_loader), loss.item()))
                 with open(experiment_name+'.txt', 'a') as f:
@@ -154,7 +154,7 @@ def evaluate(val_loader, model):
     Run the validation set on the trained model
     """
     # uncomment if you want to load from checkpoint
-    # model_path = "model/vgg16_bn_32.ckpt"
+    # model_path = "model/vgg16_bn_8.ckpt"
     # state_dict = torch.load(model_path)
     # model.load_state_dict(state_dict)
     
@@ -179,15 +179,15 @@ def evaluate(val_loader, model):
             _, predicted = torch.max(outputs.data, 1) # dim=1
             
             # accumulate stats
-            y_true.append(label.item()) # in the one
-            y_pred.append(predicted.item())
+            # y_true.append(label.tolist()) # in the one
+            # y_pred.append(predicted.tolist())
             total += label.size(0) # yeah again, number of elements in the tensor
             correct += (label == predicted).sum().item()
         
-        print('F1 Score: {}'.format(f1_score(y_true, y_pred)))
+        # print('F1 Score: {}'.format(f1_score(y_true, y_pred)))
         print('Validation accuracy: {}'.format(correct / total))
         with open(experiment_name+'.txt', 'a') as f:
-            print('F1 Score: {}'.format(f1_score(y_true, y_pred)))
+            # print('F1 Score: {}'.format(f1_score(y_true, y_pred)))
             print('Validation accuracy: {}'.format(correct / total), file=f)
     
     
