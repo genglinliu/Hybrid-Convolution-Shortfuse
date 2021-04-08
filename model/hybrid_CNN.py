@@ -26,14 +26,14 @@ class Hybrid_Conv2d(nn.Module):
     (self, channel_in, channel_out, kernel_size, cov, stride=1, padding=0)
     kernel_size are 4d weights: (out_channel, in_channel, height, width)
     """    
-    def __init__(self, channel_in, channel_out, kernel_size, cov, stride=1, padding=0):
+    def __init__(self, channel_in, channel_out, kernel_size, stride=1, padding=0):
         super(Hybrid_Conv2d, self).__init__()
         self.kernel_size = kernel_size # 4D weight (out_channel, in_channel, height, width)
         self.channel_in = channel_in
         self.channel_out = channel_out
         self.stride = stride
         self.padding = padding
-        self.cov = cov  # cov vector of shape = (minibatch,)
+        # self.cov = cov  # cov vector of shape = (minibatch,)
 
         self.W_0 = nn.Parameter(torch.randn(kernel_size), requires_grad=True)
         self.W_1 = nn.Parameter(torch.randn(kernel_size), requires_grad=True)        
@@ -46,13 +46,9 @@ class Hybrid_Conv2d(nn.Module):
  
     def forward(self, x, cov):
         # input x is of shape = (minibatch, channel=3, width, height) e.g. (32, 3, 224, 224)
-        cov = self.cov # (minibatch,)
-        W_0 = self.W_0
-        W_1 = self.W_1
-        
         outputs = []
         for s_l in cov: # s_l is the scalar covariate per data point
-            kernel = W_0 + torch.mul(W_1, s_l)       
+            kernel = self.W_0 + torch.mul(self.W_1, s_l)       
             out = F.conv2d(x, kernel, stride=self.stride, padding=self.padding)
             outputs.append(out) 
         
@@ -68,8 +64,8 @@ class HybridConvNet(nn.Module):
     """
     def __init__(self): 
         super(HybridConvNet, self).__init__()    
-        self.hybrid_conv1 = Hybrid_Conv2d(3, 16, kernel_size=(16, 3, 3, 3), cov=0) 
-        self.hybrid_conv2 = Hybrid_Conv2d(3, 16, kernel_size=(16, 3, 3, 3), cov=1)
+        self.hybrid_conv1 = Hybrid_Conv2d(3, 16, kernel_size=(16, 3, 3, 3)) 
+        self.hybrid_conv2 = Hybrid_Conv2d(3, 16, kernel_size=(16, 3, 3, 3))
         self.conv2 = nn.Conv2d(16, 32, 3)
         self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
 

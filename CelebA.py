@@ -126,8 +126,8 @@ def train(train_loader, model, criterion, optimizer, num_epochs):
             label = label.to(device)
             
             # forward pass
-            # outputs = model(images, cov_attr)    # model takes covariate here
-            outputs = model(images)
+            outputs = model(images, cov_attr)    # model takes covariate here
+            # outputs = model(images)
             loss = criterion(outputs, label) 
             
             # backward
@@ -197,7 +197,8 @@ def main():
     num_classes = 2
     batch_size = 8
     learning_rate = 0.001
-    model_name = vgg16_bn(pretrained=True)
+    # model_name = vgg16_bn(pretrained=True)
+    model_name = MyVGG16()
     
     print("Loading data...")
     train_loader, val_loader, test_loader = load_data(batch_size)

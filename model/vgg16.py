@@ -120,12 +120,12 @@ class MyVGG16(nn.Module):
         self.avgpool = vgg.avgpool
         self.classifier = vgg.classifier
         
-        # my precious baby hybrid layers
-        self.hybrid_conv = Hybrid_Conv2d(3, 16, kernel_size=(64, 3, 3, 3), cov=(0, 0, 0)) 
+        # hybrid layers
+        self.hybrid_conv = Hybrid_Conv2d(3, 16, kernel_size=(64, 3, 3, 3)) 
         
     # Set your own forward pass
     def forward(self, x, cov):
-        x = F.relu(self.hybrid_conv(x))
+        x = F.relu(self.hybrid_conv(x, cov))
         x = self.features(x)
         x = self.avgpool(x)
         x = torch.flatten(x, 1)
