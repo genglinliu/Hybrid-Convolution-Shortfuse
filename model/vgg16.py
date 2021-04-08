@@ -116,12 +116,12 @@ class MyVGG16(nn.Module):
 
         # set the three blocks you need for forward pass
         # remove the first conv layer + relu from the feature extractor
-        self.features = vgg.features[2:]
+        self.features = vgg.features[1:]
         self.avgpool = vgg.avgpool
         self.classifier = vgg.classifier
         
         # hybrid layers
-        self.hybrid_conv = Hybrid_Conv2d(3, 16, kernel_size=(64, 3, 3, 3)) 
+        self.hybrid_conv = Hybrid_Conv2d(3, 64, kernel_size=(64, 3, 3, 3)) 
         
     # Set your own forward pass
     def forward(self, x, cov):

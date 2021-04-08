@@ -174,8 +174,8 @@ def evaluate(val_loader, model):
             label = label.to(device)
             
             # forward
-            # outputs = model(images, cov_attr)
-            outputs = model(images)
+            outputs = model(images, cov_attr)
+            # outputs = model(images)
             _, predicted = torch.max(outputs.data, 1) # dim=1
             
             # accumulate stats
