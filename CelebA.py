@@ -153,9 +153,9 @@ def evaluate(val_loader, model):
     Run the validation set on the trained model
     """
     # uncomment if you want to load from checkpoint
-    model_path = "{}.ckpt".format(experiment_name)
-    state_dict = torch.load(model_path)
-    model.load_state_dict(state_dict)
+    # model_path = "{}.ckpt".format(experiment_name)
+    # state_dict = torch.load(model_path)
+    # model.load_state_dict(state_dict)
     
     model.eval() 
     with torch.no_grad():
@@ -201,7 +201,7 @@ def main():
     model_name = MyVGG16()
     
     print("Loading data...")
-    train_loader, val_loader, test_loader = load_data(batch_size)
+    train_loader, val_loader, test_loader = load_data(batch_size, use_subset=False)
     
     print("Initializing model...")
     model, criterion, optimizer = initialize_model(model_name, learning_rate, num_classes)
