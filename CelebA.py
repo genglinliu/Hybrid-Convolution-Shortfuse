@@ -29,7 +29,7 @@ device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 
 # get dataset
-def load_data(batch_size):
+def load_data(batch_size, use_subset=True):
     """
     return the train/val/test dataloader
     """
@@ -65,13 +65,13 @@ def load_data(batch_size):
     test_subset = Subset(test_dataset, indices_test)
 
     # data loader
-    train_loader = DataLoader(dataset=train_subset,
+    train_loader = DataLoader(dataset=train_subset if use_subset else train_dataset, 
                                 batch_size=batch_size,
                                 shuffle=True)
-    val_loader = DataLoader(dataset=val_subset,
+    val_loader = DataLoader(dataset=val_subset if use_subset else val_dataset,
                                 batch_size=batch_size,
                                 shuffle=False)
-    test_loader = DataLoader(dataset=test_subset,
+    test_loader = DataLoader(dataset=test_subset if use_subset else test_dataset,
                                 batch_size=batch_size,
                                 shuffle=False)
     
@@ -127,7 +127,6 @@ def train(train_loader, model, criterion, optimizer, num_epochs):
             
             # forward pass
             outputs = model(images, cov_attr)    # model takes covariate here
-            # outputs = model(images)
             loss = criterion(outputs, label) 
             
             # backward
@@ -175,19 +174,20 @@ def evaluate(val_loader, model):
             
             # forward
             outputs = model(images, cov_attr)
-            # outputs = model(images)
-            _, predicted = torch.max(outputs.data, 1) # dim=1
+            _, predicted = torch.max(outputs.data, dim=1)
             
             # accumulate stats
-            # y_true.append(label.tolist()) # in the one
-            # y_pred.append(predicted.tolist())
-            total += label.size(0) # yeah again, number of elements in the tensor
+            y_true.append(label.tolist()) # in the one
+            y_pred.append(predicted.tolist())
+            total += label.size(0) # number of elements in the tensor
             correct += (label == predicted).sum().item()
         
-        # print('F1 Score: {}'.format(f1_score(y_true, y_pred)))
+        y_true = np.array(y_true)
+        y_pred = np.array(y_pred)
+        print('F1 Score: {}'.format(f1_score(y_true, y_pred)))
         print('Validation accuracy: {}'.format(correct / total))
         with open(experiment_name+'.txt', 'a') as f:
-            # print('F1 Score: {}'.format(f1_score(y_true, y_pred)))
+            print('F1 Score: {}'.format(f1_score(y_true, y_pred)))
             print('Validation accuracy: {}'.format(correct / total), file=f)
     
     
@@ -197,7 +197,6 @@ def main():
     num_classes = 2
     batch_size = 8
     learning_rate = 0.001
-    # model_name = vgg16_bn(pretrained=True)
     model_name = MyVGG16()
     
     print("Loading data...")
