@@ -92,9 +92,31 @@ We now see how much BatchNorm helps stablize training - we will try more batchsi
  - at one point you will have to revisit the eval code, maybe add cross validation etc
 
 More exp:
- exp1: batchsize=32
- exp2: batchsize=64
+ exp1: batchsize=32 => val acc = 0.806
+ exp2: batchsize=64 => val acc = 0.805
 
 ## 4/6 updates
 
 TODOs: For each minibatch of size N, with the kernel param W0 and W1, you first convolve each data point in the minibatch with either W0 or W0+W1 (depend on the covariate), then you concat all the output of N convolution, do batchnorm
+
+## 4/9 update
+
+So we made it that the hybrid layers could take batch inputs; here is the stack of logic:
+1. In forward pass of `CelebA.py`, we have `outputs = model(images, cov_attr)`, where model is an instance of `MyVGG()` and a minibatch of images and their corresponding covariates (together as a 1d tensor) are passed in
+2. In `vgg16.py`, class MyVGG() first calls `vgg16_bn(pretrained=True)` to instantiate a pretrained vgg16_bn, then replace the first conv layer with a hybrid conv layer. In the forward pass, image and cov enter the `hybrid_conv2d` layer together
+3. In `model/hybrid_CNN.py`, we have class `Hybrid_Conv2d` and here's how this layer works:
+  - Conv kernels gets updated per minibatch
+  - Each conv kernel consists of two weight tensors, `W_0` and `W_1` (with Kaiming initialization), plus the covarite `cov[i]`. It is ultimately either `W_0` or `W_0+W_1` depending on whether cov[i] = 0 or 1
+  - As discussed, cov is an array of covariates (male=1, female=0) and the i-th cov is a scalar. 
+  - In the forward pass, we have a for loop that iterates over each data point in the mini batch
+  - for each data point, kernel is computed as k_i = W_0 + W_1 * S_i where it is a scalar multiplication. 
+  - Then we expand the first dimension of the image to make it has shape (1, 3, 224, 224)
+  - Then a standard 2D convolution is done with the kernel k_i and a single image x[i]
+  - Then after processing each data point in the minibatch, all the outputs of the Conv2d are concatenated into one
+  - This output is the final output of the hybrid layer and then it becomes the input of the BatchNorm2d layer. 
+
+Experiments:
+
+The first time I ran the hybrid vgg it only gave me a 0.7 validation accuracy / f1 micro score. Then I ran 9 experiments with dummy covariates being all 0's, all 1's and the normal covariates in the hybrid layer, each crossed with batchsize = 16, 32, and 64. The results were all similar ranging from 0.78-0.80. 
+
+I also noticed some very nice looking loss plots which has never occured before. That is, there was actually a visible downward loss curve instead of loss values just oscillating throughout the training.

@@ -24,7 +24,7 @@ from sklearn.metrics import f1_score
 from model.vgg16 import *
 from model.hybrid_CNN import Hybrid_Conv2d
 
-experiment_name = 'vgg16_bn_8_testing'
+experiment_name = 'vgg16_bn_32_hybrid'
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 
@@ -134,7 +134,7 @@ def train(train_loader, model, criterion, optimizer, num_epochs):
             loss.backward()
             optimizer.step()
             
-            if (i+1) % 10 == 0:
+            if (i+1) % 100 == 0:
                 print('Epoch: [{}/{}], Step[{}/{}], Loss:{:.4f}' \
                         .format(epoch+1, num_epochs, i+1, len(train_loader), loss.item()))
                 with open(experiment_name+'.txt', 'a') as f:
@@ -145,7 +145,7 @@ def train(train_loader, model, criterion, optimizer, num_epochs):
         
         make_plots(step_hist, loss_hist, epoch)
         
-    torch.save(model.state_dict(), experiment_name+'.ckpt')
+    # torch.save(model.state_dict(), experiment_name+'.ckpt')
 
 
 def evaluate(val_loader, model):
@@ -185,10 +185,10 @@ def evaluate(val_loader, model):
         y_true = np.concatenate(y_true)
         y_pred = np.concatenate(y_pred)
         
-        print('F1 Score: {}'.format(f1_score(y_true, y_pred, average='micro')))
+        print('F1 Score: {}'.format(f1_score(y_true, y_pred, average='macro')))
         print('Validation accuracy: {}'.format(correct / total))
         with open(experiment_name+'.txt', 'a') as f:
-            print('F1 Score: {}'.format(f1_score(y_true, y_pred, average='micro')))
+            print('F1 Score: {}'.format(f1_score(y_true, y_pred, average='macro')))
             print('Validation accuracy: {}'.format(correct / total), file=f)
     
     
