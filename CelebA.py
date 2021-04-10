@@ -24,7 +24,7 @@ from sklearn.metrics import f1_score
 from model.vgg16 import *
 from model.hybrid_CNN import Hybrid_Conv2d
 
-experiment_name = 'vgg16_bn_64_lr_1e-4'
+experiment_name = 'vgg16_bn_32_lr_1e-5'
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 
@@ -101,7 +101,8 @@ def make_plots(step_hist, loss_hist, epoch=0):
     plt.plot(step_hist, loss_hist)
     plt.xlabel('train_iterations')
     plt.ylabel('Loss')
-    plt.title('epoch'+str(epoch+1))
+    # plt.title('epoch'+str(epoch+1))
+    plt.title(experiment_name)
     plt.savefig(experiment_name)
     plt.clf()
 
@@ -196,8 +197,8 @@ def main():
     # hyper parameters    
     num_epochs = 1
     num_classes = 2
-    batch_size = 64
-    learning_rate = 1e-4
+    batch_size = 32
+    learning_rate = 1e-5
     model_name = MyVGG16()
     
     print("Loading data...")

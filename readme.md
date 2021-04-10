@@ -140,4 +140,5 @@ Manuscript Outline:
  - Discussion / Future direction (on 3D medical imaging)
 
 
- Note: the 1e-4 in results are actually 10e-4. etc
+## 4/10 Update
+More experiment results came in, with varying learning rates. I found that `batchsize=32` and `lr=1e-5` seemed to have the best performance at **0.813**. Batchsize=64 and lr=1e-5 also had 0.804 which wasn't bad. More detailed info at `experiment_outputs/hybrid_varying_lr`

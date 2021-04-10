@@ -18,7 +18,7 @@ then you concat all the output of N convolution, do batchnorm
 """
 
 ###################
-# Our hybrid layer
+# The hybrid Conv2d layer
 ###################
 
 class Hybrid_Conv2d(nn.Module):
