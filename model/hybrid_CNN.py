@@ -48,8 +48,7 @@ class Hybrid_Conv2d(nn.Module):
         # input x is of shape = (minibatch, channel=3, width, height) e.g. (32, 3, 224, 224)
         outputs = []
         for i in range(cov.shape[0]): # s_l is the scalar covariate per data point
-            kernel = self.W_0 + torch.mul(self.W_1, cov[i])  
-            # kernel = self.W_0 + torch.mul(self.W_1, 0)
+            kernel = self.W_0 + torch.mul(self.W_1, cov[i]) # debug: could replace cov[i] with 0
             x_i = torch.unsqueeze(x[i], 0) # (3, 224, 224) -> (1, 3, 224, 224) for 4d weight shape matching
             out = F.conv2d(x_i, kernel, stride=self.stride, padding=self.padding)
             outputs.append(out) 

@@ -120,3 +120,21 @@ Experiments:
 The first time I ran the hybrid vgg it only gave me a 0.7 validation accuracy / f1 micro score. Then I ran 9 experiments with dummy covariates being all 0's, all 1's and the normal covariates in the hybrid layer, each crossed with batchsize = 16, 32, and 64. The results were all similar ranging from 0.78-0.80. 
 
 I also noticed some very nice looking loss plots which has never occured before. That is, there was actually a visible downward loss curve instead of loss values just oscillating throughout the training.
+
+
+TODO:
+1. Cross validation using the train-val split; use the test set eventually
+2. Make some graphics for your paper presentation; such as the hyrbrid CNN structure
+3. Tune learning rate
+4. One more feature than gender? 
+5. Have a slideshow presentation
+
+Manuscript Outline:
+ - Introduction
+ - Background (multi-modal ML - learning from structured info)
+ - Literature Review (shortfuse, LiuNet, Flare)
+ - CelebA dataset (target labels, pytorch support, train-val-test splits)
+ - Network structure (graphics, hybrid conv)
+ - Experiments (tables, baseline, hybrid, Batch input, different LR)
+ - Observation (eevaluation metrics + results + plots)
+ - Discussion / Future direction (on 3D medical imaging)
