@@ -128,6 +128,7 @@ TODO:
 3. Tune learning rate
 4. One more feature than gender? 
 5. Have a slideshow presentation
+6. Log the entire stdout to file including the timestamps outputted by tqdm
 
 Manuscript Outline:
  - Introduction
