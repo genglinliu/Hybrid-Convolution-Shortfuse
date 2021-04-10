@@ -138,3 +138,6 @@ Manuscript Outline:
  - Experiments (tables, baseline, hybrid, Batch input, different LR)
  - Observation (eevaluation metrics + results + plots)
  - Discussion / Future direction (on 3D medical imaging)
+
+
+ Note: the 1e-4 in results are actually 10e-4. etc

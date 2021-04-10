@@ -24,7 +24,7 @@ from sklearn.metrics import f1_score
 from model.vgg16 import *
 from model.hybrid_CNN import Hybrid_Conv2d
 
-experiment_name = 'vgg16_bn_64_lr_1e-6'
+experiment_name = 'vgg16_bn_64_lr_1e-4'
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 
@@ -188,7 +188,7 @@ def evaluate(val_loader, model):
         print('F1 Score: {}'.format(f1_score(y_true, y_pred, average='macro')))
         print('Validation accuracy: {}'.format(correct / total))
         with open(experiment_name+'.txt', 'a') as f:
-            print('F1 Score: {}'.format(f1_score(y_true, y_pred, average='macro')))
+            print('F1 Score: {}'.format(f1_score(y_true, y_pred, average='macro')), file=f)
             print('Validation accuracy: {}'.format(correct / total), file=f)
     
     
@@ -197,7 +197,7 @@ def main():
     num_epochs = 1
     num_classes = 2
     batch_size = 64
-    learning_rate = 10e-6
+    learning_rate = 1e-4
     model_name = MyVGG16()
     
     print("Loading data...")
