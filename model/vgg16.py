@@ -108,9 +108,12 @@ def vgg16_bn(pretrained=False, progress=True, **kwargs):
 
 
 
-class MyVGG16(nn.Module):
+class HybridVGG16(nn.Module):
+    """
+    Hybrid Vgg16_bn network: A pretrained vgg16_bn with first conv layer being a Hybrid_Conv2d layer
+    """
     def __init__(self):
-        super(MyVGG16, self).__init__()
+        super(HybridVGG16, self).__init__()
         # load pytorch vgg16 with pretrained weights
         vgg = vgg16_bn(pretrained=True)
 

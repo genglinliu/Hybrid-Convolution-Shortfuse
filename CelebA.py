@@ -199,7 +199,8 @@ def main():
     num_classes = 2
     batch_size = 32
     learning_rate = 1e-5
-    model_name = MyVGG16()
+    model_name = HybridVGG16()
+    # model_name = vgg16_bn(pretrained=True) # baseline model
     
     print("Loading data...")
     train_loader, val_loader, test_loader = load_data(batch_size, use_subset=False)
