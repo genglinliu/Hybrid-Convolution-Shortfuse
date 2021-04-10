@@ -24,7 +24,7 @@ from sklearn.metrics import f1_score
 from model.vgg16 import *
 from model.hybrid_CNN import Hybrid_Conv2d
 
-experiment_name = 'vgg16_bn_32_lr_1e-5'
+experiment_name = 'hybrid_vgg16_bn_32_lr_1e-5'
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 
@@ -92,8 +92,7 @@ def initialize_model(model, learning_rate, num_classes):
     model = model.to(device)
     
     # Define loss function and optimizer
-    criterion = nn.CrossEntropyLoss()
-    # criterion = nn.BCELoss()
+    criterion = nn.CrossEntropyLoss()   # potential alternative: nn.BCELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
     return model, criterion, optimizer
 
@@ -127,7 +126,11 @@ def train(train_loader, model, criterion, optimizer, num_epochs):
             label = label.to(device)
             
             # forward pass
-            outputs = model(images, cov_attr)    # model takes covariate here
+            if isinstance(model, HybridVGG16):
+                outputs = model(images, cov_attr)    # hybrid model takes covariate here
+            elif isinstance(model, VGG):
+                outputs = model(images)              # baseline vgg
+            
             loss = criterion(outputs, label) 
             
             # backward
@@ -169,12 +172,16 @@ def evaluate(val_loader, model):
             cov_attr = labels[:, 20]    # gender (male/female)   
             cov_attr = (cov_attr + 1) // 2  # map from {-1, 1} to {0, 1}
             
-            # again move to device first
+            # move to device
             images = images.to(device)
             label = label.to(device)
             
-            # forward
-            outputs = model(images, cov_attr)
+            # forward pass
+            if isinstance(model, HybridVGG16):
+                outputs = model(images, cov_attr)    # hybrid model takes covariate here
+            elif isinstance(model, VGG):
+                outputs = model(images)              # baseline vgg
+                
             _, predicted = torch.max(outputs.data, dim=1)
             
             # accumulate stats
