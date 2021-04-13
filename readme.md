@@ -143,3 +143,8 @@ Manuscript Outline:
 
 ## 4/10 Update
 More experiment results came in, with varying learning rates. I found that `batchsize=32` and `lr=1e-5` seemed to have the best performance at **0.813**. Batchsize=64 and lr=1e-5 also had 0.804 which wasn't bad. More detailed info at `experiment_outputs/hybrid_varying_lr`
+
+## 4/12 update
+TODO:
+  1. Get more covariates (how to make it take an arbitrary number of covariates?)
+  2. Move the layer to second/third conv layer (hypothesis: extract higher level features)
