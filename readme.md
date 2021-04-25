@@ -67,11 +67,11 @@ The TODOs remain the same for now; a few additional things:
 I thought the script had problems so I went back to commit `bfa4b43` and checked out in another branch and pulled the old `celeb_a.py` script.
 Then I ran the following experiments:
 
-exp1: vgg16_bn  batchsize=16  old script  [val acc = 0.783] - finished under 1 hour
-exp2: vgg16     batchsize=16  old script  [val acc = 0.5200583882820758] - ocsillating training loss
-exp3: vgg16     bacthsize=1   old script  [val acc = 0.5200583882820758] - unstable training
-exp4: vgg16_bn  batchsize=1   old script  [val acc = 0.4799416117179242] -  gradient vanished
-exp5: vgg16_bn  batchsize=16  new script  [val acc = 0.791]
+ - exp1: vgg16_bn  batchsize=16  old script  [val acc = 0.783] - finished under 1 hour
+ - exp2: vgg16     batchsize=16  old script  [val acc = 0.5200583882820758] - ocsillating training loss
+ - exp3: vgg16     bacthsize=1   old script  [val acc = 0.5200583882820758] - unstable training
+ - exp4: vgg16_bn  batchsize=1   old script  [val acc = 0.4799416117179242] -  gradient vanished
+ - exp5: vgg16_bn  batchsize=16  new script  [val acc = 0.791]
 
 And so I realized the problem was probably that I gave up on vgg16_bn when I thought my hybrid layer couldn't handle minibacthes.
 From the experiments we can see how important BatchNorm is for our task. If we have pure SGD then we can't use BN.
