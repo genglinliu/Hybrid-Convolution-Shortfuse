@@ -133,11 +133,11 @@ TODO:
 Manuscript Outline:
  - Introduction
  - Background (multi-modal ML - learning from structured info)
- - Literature Review (shortfuse, LiuNet, Flare)
+ - Literature Review (shortfuse, LiuNet, Flare, CelebA sota?)
  - CelebA dataset (target labels, pytorch support, train-val-test splits)
  - Network structure (graphics, hybrid conv)
  - Experiments (tables, baseline, hybrid, Batch input, different LR)
- - Observation (eevaluation metrics + results + plots)
+ - Observation (evaluation metrics + results + plots)
  - Discussion / Future direction (on 3D medical imaging)
 
 
