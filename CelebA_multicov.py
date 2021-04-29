@@ -24,7 +24,7 @@ from sklearn.metrics import f1_score
 from model.vgg16 import *
 # from model.hybrid_CNN import Hybrid_Conv2d
 
-experiment_name = 'hybrid_vgg16_bn_32_lr_1e-5'
+experiment_name = 'hybrid_vgg16_bn_32_lr_1e-5_multicov'
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 
@@ -144,7 +144,7 @@ def train(train_loader, model, criterion, optimizer, num_epochs):
             loss.backward()
             optimizer.step()
             
-            if (i+1) % 100 == 0:
+            if (i+1) % 50 == 0:
                 print('Epoch: [{}/{}], Step[{}/{}], Loss:{:.4f}' \
                         .format(epoch+1, num_epochs, i+1, len(train_loader), loss.item()))
                 with open(experiment_name+'.txt', 'a') as f:

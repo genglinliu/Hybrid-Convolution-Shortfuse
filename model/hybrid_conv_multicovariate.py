@@ -62,7 +62,7 @@ class Hybrid_Conv2d_v2(nn.Module):
             for j in range(cov.shape[1]):
                 res.append( torch.mul(self.W[j], cov[i][j]) ) # cov[i] is an array with shape (r,); cov[i][j] is either 1 or 0
             
-            kernel = self.W_0 + torch.as_tensor(np.sum(res, axis=0))
+            kernel = self.W_0 + torch.as_tensor(np.sum(res, axis=0)).to(torch.device('cuda:0'))
             x_i = torch.unsqueeze(x[i], 0) # (3, 224, 224) -> (1, 3, 224, 224) for 4d weight shape matching
             out = F.conv2d(x_i, kernel, stride=self.stride, padding=self.padding)
             outputs.append(out) 
