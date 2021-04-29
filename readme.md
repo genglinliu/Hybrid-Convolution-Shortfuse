@@ -154,4 +154,12 @@ TODO:
 New covariates: smiling, young, high_cheekbones
 We say that when all three covariates are positive (1) the network will learn to predict 'attractive'
 
-The implementation 
+The new model takes all three covariates instead of just "gender" in the previous experiments;
+This new architecture can be easily modified again to take more than 3 covariates, althought at this point we can't simply pass them as arguments yet. 
+
+Specifically to modify the cov, you need to change them in the main script and the `self.num_cov` in the hybrid_conv file
+
+The implementation included a nested loop in the forward pass in hybrid_conv2d_v2, which may slow down running time.
+Although that both loops have a fixed length so the order of the time complexity doesn't technically increase.
+
+*The multi-cov experiments are run on `m40-long` GPU because I ran into cuda memory error on TitanX.
