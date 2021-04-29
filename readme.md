@@ -151,4 +151,7 @@ TODO:
 
 
 ## 4/29 update
-New covariates: bags_under_eyes, young, high_cheekbones
+New covariates: smiling, young, high_cheekbones
+We say that when all three covariates are positive (1) the network will learn to predict 'attractive'
+
+The implementation 

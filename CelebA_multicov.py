@@ -24,7 +24,7 @@ from sklearn.metrics import f1_score
 from model.vgg16 import *
 # from model.hybrid_CNN import Hybrid_Conv2d
 
-experiment_name = 'hybrid_vgg16_bn_32_lr_1e-5_multicov'
+experiment_name = 'hybrid_bs_32_lr_1e-5_multicov'
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 
@@ -129,6 +129,7 @@ def train(train_loader, model, criterion, optimizer, num_epochs):
             
             # move to gpu if available
             images = images.to(device)
+            cov_attrs = cov_attrs.to(device)
             label = label.to(device)
             
             # forward pass
@@ -155,7 +156,7 @@ def train(train_loader, model, criterion, optimizer, num_epochs):
         
         make_plots(step_hist, loss_hist, epoch)
         
-    # torch.save(model.state_dict(), experiment_name+'.ckpt')
+    torch.save(model.state_dict(), experiment_name+'.ckpt')
 
 
 def evaluate(val_loader, model):
@@ -186,6 +187,7 @@ def evaluate(val_loader, model):
             
             # move to device
             images = images.to(device)
+            cov_attrs = cov_attrs.to(device)
             label = label.to(device)
             
             # forward pass
@@ -222,7 +224,7 @@ def main():
     # model_name = vgg16_bn(pretrained=True) # baseline model
     
     print("Loading data...")
-    train_loader, val_loader, test_loader = load_data(batch_size, use_subset=False)
+    train_loader, val_loader, test_loader = load_data(batch_size, use_subset=True)
     
     print("Initializing model...")
     model, criterion, optimizer = initialize_model(model_name, learning_rate, num_classes)

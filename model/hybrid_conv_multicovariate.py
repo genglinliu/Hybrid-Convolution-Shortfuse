@@ -8,11 +8,9 @@ import torch.nn.functional as F
 A d-dim covaraite vector S as input
 
 K_l = W_0 + W_1 * S_l1 + W_2 * S_l2 + ...
-where S_l is one of the scalar entries of S. it is either 0 (female) or 1 (male)
+where S_l is a row of S. it consists of `r` covariates
 
-When S is a batch input, kernel param k_l still needs to be updated per data point (image)
-
-Solution: For each minibatch of size N, with the kernel param W0 and W1, 
+Compute kernel: For each minibatch of size N, with the kernel param W0 and W1, 
 first convolve each data point in the minibatch with either W_0 or W_0+W_1 (depend on the covariate), 
 then you concat all the output of N convolution, do batchnorm
 
@@ -58,11 +56,11 @@ class Hybrid_Conv2d_v2(nn.Module):
         
         outputs = []
         for i in range(cov.shape[0]): # for every image x[i] there are r covariates
-            res = []
-            for j in range(cov.shape[1]):
-                res.append( torch.mul(self.W[j], cov[i][j]) ) # cov[i] is an array with shape (r,); cov[i][j] is either 1 or 0
+            res = torch.zeros_like(self.W_0)
+            for j in range(cov.shape[1]): # for every cov
+                res += ( torch.mul(self.W[j], cov[i][j]) ).to('cuda:0') # cov[i] is an array with shape (r,); cov[i][j] is either 1 or 0
             
-            kernel = self.W_0 + torch.as_tensor(np.sum(res, axis=0)).to(torch.device('cuda:0'))
+            kernel = self.W_0 + res
             x_i = torch.unsqueeze(x[i], 0) # (3, 224, 224) -> (1, 3, 224, 224) for 4d weight shape matching
             out = F.conv2d(x_i, kernel, stride=self.stride, padding=self.padding)
             outputs.append(out) 
