@@ -7,7 +7,7 @@ import torch.nn.functional as F
 """
 A d-dim covaraite vector S as input
 
-K_l = W_0 + W_1 * S_l 
+K_l = W_0 + W_1 * S_l1 + W_2 * S_l2 + ...
 where S_l is one of the scalar entries of S. it is either 0 (female) or 1 (male)
 
 When S is a batch input, kernel param k_l still needs to be updated per data point (image)
@@ -22,13 +22,13 @@ then you concat all the output of N convolution, do batchnorm
 # The hybrid Conv2d layer
 ###################
 
-class Hybrid_Conv2d(nn.Module):
+class Hybrid_Conv2d_v2(nn.Module):
     """    
     (self, channel_in, channel_out, kernel_size, cov, stride=1, padding=0)
     kernel_size are 4d weights: (out_channel, in_channel, height, width)
     """    
     def __init__(self, channel_in, channel_out, kernel_size, stride=1, padding=0):
-        super(Hybrid_Conv2d, self).__init__()
+        super(Hybrid_Conv2d_v2, self).__init__()
         self.kernel_size = kernel_size # 4D weight (out_channel, in_channel, height, width)
         self.channel_in = channel_in
         self.channel_out = channel_out
