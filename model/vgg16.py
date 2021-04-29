@@ -110,7 +110,8 @@ def vgg16_bn(pretrained=False, progress=True, **kwargs):
 
 class HybridVGG16(nn.Module):
     """
-    Hybrid Vgg16_bn network: A pretrained vgg16_bn with first conv layer being a Hybrid_Conv2d layer
+    Hybrid Vgg16_bn network: A pretrained vgg16_bn with FIRST conv layer being a Hybrid_Conv2d layer
+    
     """
     def __init__(self):
         super(HybridVGG16, self).__init__()
@@ -131,6 +132,37 @@ class HybridVGG16(nn.Module):
     def forward(self, x, cov):
         x = F.relu(self.hybrid_conv(x, cov))
         x = self.features(x)
+        x = self.avgpool(x)
+        x = torch.flatten(x, 1)
+        x = self.classifier(x)
+        return x
+
+
+
+class HybridVGG16_v2(nn.Module):
+    """
+    Hybrid Vgg16_bn network: A pretrained vgg16_bn with SECOND conv layer (vgg.feature[3]) being a Hybrid_Conv2d layer
+    """
+    def __init__(self):
+        super(HybridVGG16_v2, self).__init__()
+        # load pytorch vgg16 with pretrained weights
+        vgg = vgg16_bn(pretrained=True)
+
+        # set the three blocks you need for forward pass
+        # remove the first conv layer + relu from the feature extractor
+        self.features_1 = vgg.features[0:3] # layer 0, 1, 2
+        self.features_2 = vgg.features[4:]
+        self.avgpool = vgg.avgpool
+        self.classifier = vgg.classifier
+        
+        # hybrid layer - to replace vgg.features[3]
+        self.hybrid_conv = Hybrid_Conv2d_v2(64, 64, kernel_size=(64, 64, 3, 3)) 
+        
+    # Set your own forward pass
+    def forward(self, x, cov):
+        x = self.features_1(x)
+        x = self.hybrid_conv(x, cov)
+        x = self.features_2(x)
         x = self.avgpool(x)
         x = torch.flatten(x, 1)
         x = self.classifier(x)
