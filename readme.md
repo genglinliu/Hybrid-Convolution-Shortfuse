@@ -148,3 +148,7 @@ More experiment results came in, with varying learning rates. I found that `batc
 TODO:
   1. Get more covariates (how to make it take an arbitrary number of covariates?)
   2. Move the layer to second/third conv layer (hypothesis: extract higher level features)
+
+
+## 4/29 update
+New covariates: bags_under_eyes, young, high_cheekbones
