@@ -24,7 +24,7 @@ from sklearn.metrics import f1_score
 from model.vgg16 import *
 # from model.hybrid_CNN import Hybrid_Conv2d
 
-experiment_name = 'hybrid_bs_32_lr_1e-5_multicov'
+experiment_name = 'hybrid_bs_32_lr_1e-5_multicov_2ndConv'
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 
@@ -133,10 +133,11 @@ def train(train_loader, model, criterion, optimizer, num_epochs):
             label = label.to(device)
             
             # forward pass
-            if isinstance(model, HybridVGG16):
+            if isinstance(model, VGG):
+                outputs = model(images)               # baseline vgg
+            
+            else:
                 outputs = model(images, cov_attrs)    # hybrid model takes covariate here
-            elif isinstance(model, VGG):
-                outputs = model(images)              # baseline vgg
             
             loss = criterion(outputs, label) 
             
@@ -191,10 +192,11 @@ def evaluate(val_loader, model):
             label = label.to(device)
             
             # forward pass
-            if isinstance(model, HybridVGG16):
-                outputs = model(images, cov_attrs)    # hybrid model takes covariates here, Tensor (minibatch, num_cov)
-            elif isinstance(model, VGG):
-                outputs = model(images)              # baseline vgg
+            if isinstance(model, VGG):
+                outputs = model(images)               # baseline vgg
+            
+            else: 
+                outputs = model(images, cov_attrs)    # hybrid model takes covariate here
                 
             _, predicted = torch.max(outputs.data, dim=1)
             
@@ -220,7 +222,7 @@ def main():
     num_classes = 2
     batch_size = 32
     learning_rate = 1e-5
-    model_name = HybridVGG16()
+    model_name = HybridVGG16_v2()
     # model_name = vgg16_bn(pretrained=True) # baseline model
     
     print("Loading data...")

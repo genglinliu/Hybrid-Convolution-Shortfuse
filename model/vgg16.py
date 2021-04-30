@@ -130,7 +130,7 @@ class HybridVGG16(nn.Module):
         
     # Set your own forward pass
     def forward(self, x, cov):
-        x = F.relu(self.hybrid_conv(x, cov))
+        x = self.hybrid_conv(x, cov)
         x = self.features(x)
         x = self.avgpool(x)
         x = torch.flatten(x, 1)
@@ -142,6 +142,7 @@ class HybridVGG16(nn.Module):
 class HybridVGG16_v2(nn.Module):
     """
     Hybrid Vgg16_bn network: A pretrained vgg16_bn with SECOND conv layer (vgg.feature[3]) being a Hybrid_Conv2d layer
+    confusing error: it gives None type in Logmax
     """
     def __init__(self):
         super(HybridVGG16_v2, self).__init__()
@@ -180,7 +181,7 @@ class HybridVGG16_v3(nn.Module):
 
         # set the three blocks you need for forward pass
         # remove the first conv layer + relu from the feature extractor
-        self.features_1 = vgg.features[0:7] # layers 0-5
+        self.features_1 = vgg.features[0:7] # layers 0-6
         self.features_2 = vgg.features[8:]  # layers 
         self.avgpool = vgg.avgpool
         self.classifier = vgg.classifier
