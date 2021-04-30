@@ -163,3 +163,7 @@ The implementation included a nested loop in the forward pass in hybrid_conv2d_v
 Although that both loops have a fixed length so the order of the time complexity doesn't technically increase.
 
 *The multi-cov experiments are run on `m40-long` GPU because I ran into cuda memory error on TitanX.
+
+## 4/30 update
+
+Results: both later fused layers and multi-covariate experiments worked and gave above 0.80 accuracy/F1 score. But there isn't significant increase from baseline or the model with only one covariate; so we will just report it as is. 
