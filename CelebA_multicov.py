@@ -24,7 +24,7 @@ from sklearn.metrics import f1_score
 from model.vgg16 import *
 # from model.hybrid_CNN import Hybrid_Conv2d
 
-experiment_name = 'hybrid_bs_32_lr_1e-5_multicov_2ndConv'
+experiment_name = 'hybrid_bs_32_lr_1e-5_multicov_latefuse40'
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 
@@ -222,7 +222,7 @@ def main():
     num_classes = 2
     batch_size = 32
     learning_rate = 1e-5
-    model_name = HybridVGG16_v2()
+    model_name = HybridVGG16_v40()
     # model_name = vgg16_bn(pretrained=True) # baseline model
     
     print("Loading data...")
