@@ -167,3 +167,6 @@ Although that both loops have a fixed length so the order of the time complexity
 ## 4/30 update
 
 Results: both later fused layers and multi-covariate experiments worked and gave above 0.80 accuracy/F1 score. But there isn't significant increase from baseline or the model with only one covariate; so we will just report it as is. 
+
+## 5/3 update
+Manuscript almost finished; working on slideshow presentation
